@@ -1,0 +1,669 @@
+<!-- File: rearview.html -->
+<!DOCTYPE html>
+<html lang="zh-CN" class="rearview-page">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>后视镜｜《金钱心理学》× 旧课程笔记</title>
+<style>
+  :root {
+    --ink: #e9e4d8;
+    --ink-dim: #a39d90;
+    --amber: #f2b45c;
+    --cyan: #8fd3e8;
+    --rose: #e79a8f;
+    --glass: rgba(20, 26, 34, 0.92);
+    --mirror-w: 280px;
+    --mirror-h: 124px;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    height: 100%;
+    background: #05070b;
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* ---------- 夜路 ---------- */
+  .road {
+    position: absolute;
+    inset: 0;
+    will-change: filter;
+  }
+
+  .road svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .dash {
+    stroke-dasharray: 26 34;
+    animation: drive 1.4s linear infinite;
+  }
+
+  @keyframes drive {
+    to {
+      stroke-dashoffset: -60;
+    }
+  }
+
+  .fog {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 55%, rgba(60, 70, 85, 0.0) 0%, rgba(10, 12, 18, 0.85) 70%),
+      linear-gradient(to bottom, rgba(8, 10, 14, 0.6), rgba(8, 10, 14, 0.9));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 60%, transparent 45%, rgba(0, 0, 0, 0.75) 100%);
+  }
+
+  .road-label {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    color: rgba(233, 228, 216, 0.55);
+    pointer-events: none;
+  }
+
+  /* ---------- 标题 ---------- */
+  .title {
+    position: absolute;
+    top: max(18px, env(safe-area-inset-top));
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 0 16px;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .kicker {
+    display: inline-block;
+    font-size: clamp(15px, 3.6vw, 20px);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 6px 14px;
+    border: 1px solid rgba(242, 180, 92, 0.55);
+    border-radius: 999px;
+    color: var(--amber);
+    background: rgba(242, 180, 92, 0.08);
+  }
+
+  .kicker .x {
+    color: var(--ink-dim);
+    margin: 0 0.3em;
+    font-weight: 400;
+  }
+
+  .title h1 {
+    margin-top: 10px;
+    font-size: clamp(22px, 5.4vw, 34px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .title h1 span {
+    display: block;
+    margin-top: 4px;
+    font-size: clamp(13px, 3.2vw, 16px);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--ink-dim);
+  }
+
+  /* ---------- 后视镜 ---------- */
+  .mount {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--mirror-w);
+    height: var(--mirror-h);
+    margin-left: calc(var(--mirror-w) / -2);
+    perspective: 900px;
+    z-index: 4;
+  }
+
+  .stem {
+    position: absolute;
+    left: 50%;
+    top: -22px;
+    width: 10px;
+    height: 26px;
+    margin-left: -5px;
+    background: linear-gradient(#2a2f37, #15181d);
+    border-radius: 3px;
+  }
+
+  .mirror {
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    padding: 7px;
+    background: linear-gradient(160deg, #3a3f48, #14171c 60%, #22262d);
+    box-shadow:
+      0 14px 40px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform-origin: 50% 0%;
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+    will-change: transform;
+  }
+
+  .mirror:active {
+    cursor: grabbing;
+  }
+
+  .mirror:focus-visible {
+    box-shadow:
+      0 0 0 3px rgba(143, 211, 232, 0.7),
+      0 14px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .mirror.invite::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 28px;
+    border: 1px solid rgba(242, 180, 92, 0.6);
+    animation: halo 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes halo {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1.04);
+    }
+  }
+
+  .glass {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--glass);
+  }
+
+  .reflection {
+    position: absolute;
+    inset: 0;
+    opacity: 0.55;
+  }
+
+  .reflection svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .note {
+    position: absolute;
+    inset: 0;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    will-change: filter, opacity;
+  }
+
+  .tag {
+    display: inline-block;
+    align-self: flex-start;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    padding: 4px 7px;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  .tag.note-tag {
+    color: #0d1117;
+    background: var(--cyan);
+  }
+
+  .tag.judge-tag {
+    color: #0d1117;
+    background: var(--rose);
+  }
+
+  .tag.book-tag {
+    color: #0d1117;
+    background: var(--amber);
+  }
+
+  .note .line1 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .note .line2 {
+    font-size: 10.5px;
+    color: var(--ink-dim);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .chips span {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(143, 211, 232, 0.5);
+    color: var(--cyan);
+  }
+
+  .glare {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.14) 0%, transparent 35%, transparent 65%, rgba(255, 255, 255, 0.06) 100%);
+    pointer-events: none;
+  }
+
+  /* ---------- 底部区域 ---------- */
+  .dock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .card {
+    width: min(560px, 100%);
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(12, 15, 20, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .card p {
+    font-size: clamp(13px, 3.4vw, 15px);
+    line-height: 1.6;
+  }
+
+  .card small {
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .card.show {
+    opacity: 1;
+    transform: none;
+  }
+
+  .controls {
+    width: min(560px, 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .meter {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .bar {
+    position: relative;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(242, 180, 92, 0.75);
+    overflow: hidden;
+  }
+
+  .bar i {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0%;
+    background: var(--cyan);
+  }
+
+  .hint {
+    font-size: clamp(14px, 3.6vw, 16px);
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    min-height: 1.4em;
+    transition: opacity 0.3s;
+  }
+
+  .return-link { pointer-events: auto; color: var(--amber); font-size: 12px; padding: 6px 12px; }
+  .return-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dash,
+    .mirror.invite::after {
+      animation: none;
+    }
+    .card {
+      transition: none;
+    }
+  }
+</style>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body data-page="rearview">
+<main class="stage" id="stage">
+
+  <div class="road" id="road" aria-hidden="true">
+    <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#05070d"/>
+          <stop offset="0.7" stop-color="#121a2a"/>
+          <stop offset="1" stop-color="#1d2536"/>
+        </linearGradient>
+        <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1a1d23"/>
+          <stop offset="1" stop-color="#2b2f36"/>
+        </linearGradient>
+        <radialGradient id="beam" cx="0.5" cy="1" r="0.75">
+          <stop offset="0" stop-color="#f6e2b0" stop-opacity="0.5"/>
+          <stop offset="0.6" stop-color="#f6e2b0" stop-opacity="0.08"/>
+          <stop offset="1" stop-color="#f6e2b0" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="1000" height="420" fill="url(#sky)"/>
+      <g fill="#cfd8e6">
+        <circle cx="120" cy="80" r="1.2" opacity="0.7"/>
+        <circle cx="260" cy="140" r="1" opacity="0.5"/>
+        <circle cx="410" cy="60" r="1.4" opacity="0.8"/>
+        <circle cx="620" cy="110" r="1" opacity="0.6"/>
+        <circle cx="760" cy="50" r="1.3" opacity="0.7"/>
+        <circle cx="880" cy="160" r="1" opacity="0.5"/>
+        <circle cx="540" cy="190" r="0.9" opacity="0.4"/>
+      </g>
+      <path d="M0 420 L140 395 L260 405 L380 388 L500 400 L640 386 L770 402 L900 392 L1000 404 L1000 420 Z" fill="#0b0e14"/>
+      <rect y="420" width="1000" height="280" fill="#0c0f14"/>
+      <polygon points="485,420 515,420 1000,700 0,700" fill="url(#asphalt)"/>
+      <polygon points="485,420 515,420 1000,700 0,700" fill="url(#beam)"/>
+      <line x1="487" y1="420" x2="40" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
+      <line x1="513" y1="420" x2="960" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
+      <line class="dash" x1="500" y1="420" x2="500" y2="700" stroke="#f2c46b" stroke-width="5"/>
+      <circle cx="500" cy="414" r="2.2" fill="#f7e3b5" opacity="0.9"/>
+    </svg>
+  </div>
+  <div class="fog" id="fog"></div>
+  <div class="vignette"></div>
+  <div class="road-label" id="roadLabel">前 路</div>
+
+  <header class="title" id="title">
+    <div class="kicker">《金钱心理学》<span class="x">×</span>旧课程笔记</div>
+    <h1>后视镜<span>重看旧笔记，能看清多少前路？</span></h1>
+  </header>
+
+  <div class="mount" id="mount">
+    <div class="stem"></div>
+    <div class="mirror invite" id="mirror" role="slider" tabindex="0"
+         aria-label="后视镜角度：越转向自己，旧笔记越清晰，前路越模糊"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="glass">
+        <div class="reflection" aria-hidden="true">
+          <svg viewBox="0 0 280 124" preserveAspectRatio="xMidYMid slice">
+            <rect width="280" height="124" fill="#0f141c"/>
+            <polygon points="130,40 150,40 280,124 0,124" fill="#1b1f26"/>
+            <line x1="140" y1="40" x2="140" y2="124" stroke="#6b5a35" stroke-width="2" stroke-dasharray="8 10"/>
+          </svg>
+        </div>
+        <div class="note" id="note">
+          <span class="tag note-tag">旧笔记 · 概括</span>
+          <div class="line1">准备到 60 分可以开始</div>
+          <div class="line2">记录过的选书途径：</div>
+          <div class="chips">
+            <span>论坛</span>
+            <span>电子书应用</span>
+            <span>书评</span>
+            <span>听书</span>
+          </div>
+        </div>
+        <div class="glare"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dock" id="dock">
+    <section class="card" id="judge" aria-live="polite">
+      <span class="tag judge-tag">我的判断 · 概括</span>
+      <p>重看旧笔记时，我认为：某些基本认知仍有用，但过去的具体内容需要谨慎判断。</p>
+    </section>
+    <section class="card" id="quote" aria-live="polite">
+      <span class="tag book-tag">书中观点</span>
+      <p>历史有助于校准预期，却不是未来的地图。</p>
+      <small>《金钱心理学》观点概括</small>
+    </section>
+    <div class="controls">
+      <div class="meter" aria-hidden="true">
+        <span>镜中</span>
+        <div class="bar"><i id="barFill"></i></div>
+        <span>前路</span>
+      </div>
+      <p class="hint" id="hint">拖动后视镜，回头看看</p>
+    </div>
+    <a class="return-link" href="index.html">← 返回书的入口</a>
+  </div>
+
+</main>
+
+<script>
+/* 本地内容配置：以下均为内容概括。 */
+var CONTENT = {
+  noteSummary: "准备到 60 分可以开始",
+  tools: ["论坛", "电子书应用", "书评", "听书"],
+  judgment: "重看旧笔记时，我认为：某些基本认知仍有用，但过去的具体内容需要谨慎判断。",
+  bookView: "历史有助于校准预期，却不是未来的地图。"
+};
+
+(function () {
+  var road = document.getElementById("road");
+  var fog = document.getElementById("fog");
+  var roadLabel = document.getElementById("roadLabel");
+  var title = document.getElementById("title");
+  var mount = document.getElementById("mount");
+  var mirror = document.getElementById("mirror");
+  var note = document.getElementById("note");
+  var dock = document.getElementById("dock");
+  var judge = document.getElementById("judge");
+  var quote = document.getElementById("quote");
+  var barFill = document.getElementById("barFill");
+  var hint = document.getElementById("hint");
+
+  note.querySelector(".line1").textContent = CONTENT.noteSummary;
+  var chips = note.querySelector(".chips");
+  chips.textContent = "";
+  CONTENT.tools.forEach(function (tool) {
+    var chip = document.createElement("span");
+    chip.textContent = tool;
+    chips.appendChild(chip);
+  });
+  judge.querySelector("p").textContent = CONTENT.judgment;
+  quote.querySelector("p").textContent = CONTENT.bookView;
+
+
+  var MW = 280;
+  var MH = 124;
+  var t = 0;
+  var baseScale = 1;
+  var maxScale = 2;
+  var dragging = false;
+  var touched = false;
+  var startX = 0;
+  var startY = 0;
+  var startT = 0;
+  var keyTimer = null;
+
+  function clamp(v, a, b) {
+    return Math.min(b, Math.max(a, v));
+  }
+
+  function layout() {
+    var vw = document.getElementById("stage").clientWidth;
+    var mobile = window.matchMedia("(max-width: 760px)").matches;
+    MH = mobile ? 160 : 124;
+    var top = title.offsetTop + title.offsetHeight + 34;
+    mount.style.top = top + "px";
+
+    baseScale = Math.min(1, (vw * (mobile ? 0.82 : 0.62)) / MW);
+    var dockTop = dock.offsetTop;
+    var availH = Math.max(MH * baseScale, dockTop - top - 12);
+    maxScale = Math.max(baseScale, Math.min(2.2, (vw * 0.94) / MW, availH / MH));
+    render();
+  }
+
+  function render() {
+    var s = baseScale + (maxScale - baseScale) * t;
+    var tilt = (1 - t) * 22;
+    mirror.style.transform =
+      "scale(" + s.toFixed(3) + ") rotateY(" + (-tilt).toFixed(2) + "deg) rotateX(" + ((1 - t) * 8).toFixed(2) + "deg)";
+
+    note.style.filter = "blur(" + ((1 - t) * 6.5).toFixed(2) + "px)";
+    note.style.opacity = (0.3 + 0.7 * t).toFixed(3);
+
+    road.style.filter =
+      "blur(" + (t * 9).toFixed(2) + "px) brightness(" + (1 - t * 0.55).toFixed(3) + ")";
+    fog.style.opacity = (t * 0.85).toFixed(3);
+    roadLabel.style.opacity = (0.9 * (1 - t)).toFixed(3);
+    roadLabel.style.filter = "blur(" + (t * 5).toFixed(2) + "px)";
+
+    barFill.style.width = (t * 100).toFixed(1) + "%";
+    mirror.setAttribute("aria-valuenow", Math.round(t * 100));
+
+    var mid = 1 - Math.abs(t - 0.5) / 0.28;
+    judge.classList.toggle("show", mid > 0);
+    judge.style.opacity = mid > 0 ? clamp(mid * 1.4, 0, 1).toFixed(3) : "";
+
+    if (!touched) {
+      hint.textContent = "拖动后视镜，回头看看";
+    } else if (t < 0.18) {
+      hint.textContent = "前路清楚，镜中只剩轮廓";
+    } else if (t > 0.82) {
+      hint.textContent = "旧笔记清楚了，前路却看不清";
+    } else {
+      hint.textContent = "两边都只看得清一部分";
+    }
+  }
+
+  function settle() {
+    quote.classList.toggle("show", touched && t > 0.04);
+  }
+
+  function onDown(e) {
+    dragging = true;
+    touched = true;
+    mirror.classList.remove("invite");
+    quote.classList.remove("show");
+    startX = e.clientX;
+    startY = e.clientY;
+    startT = t;
+    if (mirror.setPointerCapture) {
+      mirror.setPointerCapture(e.pointerId);
+    }
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    var d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    var range = Math.max(180, Math.min(window.innerHeight, window.innerWidth) * 0.45);
+    t = clamp(startT + d / range, 0, 1);
+    render();
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    settle();
+  }
+
+  mirror.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp);
+  window.addEventListener("pointercancel", onUp);
+
+  mirror.addEventListener("keydown", function (e) {
+    var step = 0;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") step = 0.05;
+    if (e.key === "ArrowLeft" || e.key === "ArrowUp") step = -0.05;
+    if (e.key === "Home") { t = 0; step = 0.0001; }
+    if (e.key === "End") { t = 1; step = 0.0001; }
+    if (!step) return;
+    e.preventDefault();
+    touched = true;
+    mirror.classList.remove("invite");
+    quote.classList.remove("show");
+    t = clamp(t + (Math.abs(step) < 0.001 ? 0 : step), 0, 1);
+    render();
+    clearTimeout(keyTimer);
+    keyTimer = setTimeout(settle, 450);
+  });
+
+  window.addEventListener("resize", layout);
+  window.addEventListener("orientationchange", layout);
+  layout();
+})();
+</script>
+</body>
+</html>

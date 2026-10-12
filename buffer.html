@@ -1,0 +1,1734 @@
+<!-- File: buffer.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>这笔钱，先不安排｜阅读装置</title>
+<style>
+  :root {
+    --ink: #e9e4d8;
+    --ink-dim: #a39d90;
+    --ink-faint: rgba(233, 228, 216, 0.4);
+    --amber: #f2b45c;
+    --amber-soft: rgba(242, 180, 92, 0.12);
+    --rose: #e79a8f;
+    --cyan: #8fd3e8;
+    --paper: #ece3cf;
+    --paper-ink: #2b241b;
+    --paper-dim: #6f6352;
+    --glass: rgba(12, 16, 22, 0.72);
+    --glass-line: rgba(255, 255, 255, 0.09);
+    --chip: 30px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    background: #05070b;
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    overflow-x: hidden;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(242, 180, 92, 0.1) 0%, transparent 45%),
+      radial-gradient(ellipse at 70% 80%, rgba(40, 52, 72, 0.35) 0%, transparent 60%),
+      #05070b;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: max(18px, env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 0;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-line);
+    background: rgba(14, 18, 25, 0.6);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    border-color: rgba(242, 180, 92, 0.55);
+  }
+
+  .back:focus-visible {
+    box-shadow: 0 0 0 3px rgba(143, 211, 232, 0.7);
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 6px 12px;
+    border: 1px solid rgba(242, 180, 92, 0.5);
+    border-radius: 999px;
+    color: var(--amber);
+    background: var(--amber-soft);
+    white-space: nowrap;
+  }
+
+  /* ---------- 开场 ---------- */
+  .intro {
+    text-align: center;
+    padding: clamp(16px, 3.5vh, 32px) 16px 0;
+  }
+
+  .intro h1 {
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .lead {
+    margin-top: 12px;
+    font-size: clamp(15px, 2.2vw, 19px);
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+
+  .demo {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+
+  /* ---------- 书桌 ---------- */
+  .scene {
+    position: relative;
+    width: min(1080px, 100% - 24px);
+    margin: clamp(16px, 3vh, 28px) auto 0;
+    padding: clamp(14px, 2.4vw, 26px);
+  }
+
+  .desk-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(91deg, rgba(255, 255, 255, 0.018) 0 2px, transparent 2px 11px),
+      linear-gradient(172deg, #2a2119 0%, #1a140f 62%, #100c09 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(242, 180, 92, 0.28),
+      0 30px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  .lamp {
+    position: absolute;
+    left: -10%;
+    top: -30%;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242, 180, 92, 0.24) 0%, rgba(242, 180, 92, 0.05) 40%, transparent 65%);
+    animation: breathe 8s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      opacity: 0.75;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .scene-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 2vw, 20px);
+  }
+
+  /* ---------- 账目条 ---------- */
+  .status {
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-line);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .ledger {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+  }
+
+  .arrived {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--amber);
+    margin-right: auto;
+  }
+
+  .arrived::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 10px var(--amber);
+  }
+
+  .l-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .l-item b {
+    display: inline-block;
+    min-width: 1ch;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .l-item.free b {
+    color: var(--amber);
+  }
+
+  .l-item.paid b {
+    color: var(--rose);
+  }
+
+  .bump {
+    animation: bump 0.45s var(--ease);
+  }
+
+  @keyframes bump {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.35);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .sum {
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hint {
+    font-size: clamp(14px, 1.9vw, 16px);
+    line-height: 1.55;
+    letter-spacing: 0.04em;
+    min-height: 1.55em;
+    color: var(--ink);
+  }
+
+  /* ---------- 用途卡 ---------- */
+  .uses {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(10px, 1.6vw, 16px);
+  }
+
+  .use {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 150px;
+    padding: 14px 14px 12px;
+    border: 0;
+    border-radius: 6px 6px 10px 10px;
+    text-align: left;
+    color: var(--paper-ink);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 23px, rgba(43, 36, 27, 0.06) 23px 24px),
+      linear-gradient(170deg, #f3ebd9 0%, var(--paper) 60%, #ddd2ba 100%);
+    box-shadow:
+      0 10px 22px rgba(0, 0, 0, 0.45),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    outline: none;
+    transition: box-shadow 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .use:nth-child(1) {
+    rotate: -1deg;
+  }
+
+  .use:nth-child(3) {
+    rotate: 0.8deg;
+  }
+
+  .use[aria-disabled="true"] {
+    cursor: default;
+  }
+
+  .use:hover:not([aria-disabled="true"]) {
+    box-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.5),
+      0 0 0 2px rgba(242, 180, 92, 0.7);
+  }
+
+  .use:focus-visible {
+    box-shadow:
+      0 0 0 3px #05070b,
+      0 0 0 6px var(--cyan),
+      0 10px 22px rgba(0, 0, 0, 0.45);
+  }
+
+  .use-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .use-icon {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    color: #8a5a1c;
+  }
+
+  .use-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .use-name {
+    font-size: clamp(16px, 1.7vw, 19px);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  .use-note {
+    font-size: 11.5px;
+    color: var(--paper-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .bed {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: var(--chip);
+  }
+
+  .use .bed {
+    margin-top: auto;
+  }
+
+  .use-state {
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--paper-dim);
+    padding-top: 8px;
+    border-top: 1px dashed rgba(43, 36, 27, 0.22);
+  }
+
+  .use.locked .use-state::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 2px;
+    border: 1.5px solid currentColor;
+    vertical-align: 0;
+  }
+
+  .use.releasable {
+    animation: offer 1.8s ease-in-out infinite;
+  }
+
+  .use.releasable .use-state {
+    color: #8a5a1c;
+    font-weight: 700;
+  }
+
+  @keyframes offer {
+    0%, 100% {
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(242, 180, 92, 0.3);
+    }
+    50% {
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(242, 180, 92, 0.85);
+    }
+  }
+
+  .use.dim {
+    filter: saturate(0.6) brightness(0.82);
+  }
+
+  .use.paused {
+    filter: saturate(0.5) brightness(0.86);
+  }
+
+  .stamp {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    padding: 3px 8px;
+    border: 2px solid #b5574b;
+    border-radius: 4px;
+    color: #b5574b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    rotate: -8deg;
+    opacity: 0;
+    scale: 1.4;
+    transition: opacity 0.35s ease 0.25s, scale 0.35s var(--ease) 0.25s;
+    pointer-events: none;
+  }
+
+  .use.paused .stamp {
+    opacity: 0.9;
+    scale: 1;
+  }
+
+  /* ---------- 筹码 ---------- */
+  .chip {
+    position: relative;
+    flex: none;
+    width: var(--chip);
+    height: var(--chip);
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #ffe4ad 0%, #f2b45c 42%, #b6772a 100%);
+    box-shadow:
+      inset 0 0 0 2px rgba(120, 72, 20, 0.55),
+      inset 0 0 0 5px rgba(255, 232, 186, 0.32),
+      0 3px 6px rgba(0, 0, 0, 0.45);
+  }
+
+  .chip::after {
+    content: "";
+    position: absolute;
+    inset: 31%;
+    border-radius: 50%;
+    border: 1.5px solid rgba(120, 72, 20, 0.5);
+  }
+
+  .chip.moving {
+    z-index: 20;
+  }
+
+  .gap {
+    flex: none;
+    width: var(--chip);
+    height: var(--chip);
+    border-radius: 50%;
+    border: 1.5px dashed rgba(43, 36, 27, 0.32);
+  }
+
+  /* ---------- 下排：留白区与计划外 ---------- */
+  .lower {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(10px, 1.6vw, 16px);
+    align-items: stretch;
+  }
+
+  .tray {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 170px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1.5px dashed rgba(242, 180, 92, 0.55);
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(242, 180, 92, 0.12), transparent 70%),
+      rgba(10, 13, 18, 0.55);
+    box-shadow: inset 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .tray-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .tray-name {
+    font-size: clamp(16px, 1.8vw, 19px);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+  }
+
+  .tray-count {
+    font-size: 13px;
+    color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tray-sub {
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  .tray .bed {
+    flex: 1;
+    align-content: flex-start;
+    padding-top: 4px;
+  }
+
+  .tray-empty {
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.1em;
+  }
+
+  .event-zone {
+    position: relative;
+    display: flex;
+    min-height: 170px;
+  }
+
+  .event-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 18px;
+    border: 1.5px dashed rgba(231, 154, 143, 0.5);
+    background: rgba(10, 13, 18, 0.45);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .event-btn:hover {
+    border-color: var(--rose);
+    background: rgba(231, 154, 143, 0.08);
+  }
+
+  .event-btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--cyan);
+  }
+
+  .event-q {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(231, 154, 143, 0.6);
+    color: var(--rose);
+    font-size: 22px;
+    font-weight: 800;
+    animation: knock 2.6s ease-in-out infinite;
+  }
+
+  @keyframes knock {
+    0%, 80%, 100% {
+      rotate: 0deg;
+    }
+    85% {
+      rotate: -10deg;
+    }
+    90% {
+      rotate: 8deg;
+    }
+    95% {
+      rotate: -4deg;
+    }
+  }
+
+  .event-btn-text {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+
+  .event-card {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 18px;
+    background:
+      radial-gradient(ellipse at 90% 0%, rgba(231, 154, 143, 0.2), transparent 60%),
+      rgba(14, 18, 25, 0.88);
+    border: 1px solid rgba(231, 154, 143, 0.45);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    translate: 0 14px;
+    transition: opacity 0.45s ease, translate 0.5s var(--ease);
+  }
+
+  .event-card.show {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .ev-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ev-tag {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    padding: 4px 9px;
+    border-radius: 4px;
+    color: #0d1117;
+    background: var(--rose);
+  }
+
+  .ev-status {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--rose);
+  }
+
+  .ev-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ev-icon {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    color: var(--rose);
+  }
+
+  .ev-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .ev-text {
+    font-size: clamp(16px, 1.9vw, 19px);
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+  }
+
+  .ev-sub {
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+  }
+
+  .event-card .gap {
+    border-color: rgba(231, 154, 143, 0.6);
+  }
+
+  .ev-ledger {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ev-ledger b {
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .ev-ledger .unpaid b {
+    color: var(--rose);
+  }
+
+  .ev-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+  }
+
+  /* ---------- 按钮 ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 180, 92, 0.55);
+    background: rgba(242, 180, 92, 0.1);
+    color: var(--amber);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .btn:hover {
+    background: rgba(242, 180, 92, 0.22);
+  }
+
+  .btn.primary {
+    background: var(--amber);
+    color: #0d1117;
+    font-weight: 700;
+  }
+
+  .btn.primary:hover {
+    background: #f6c47a;
+  }
+
+  .btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--cyan);
+  }
+
+  /* ---------- 发现 ---------- */
+  .finale {
+    width: min(760px, 100% - 32px);
+    margin: clamp(24px, 4vh, 40px) auto max(36px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 0.6s ease, translate 0.6s var(--ease);
+  }
+
+  .finale.show {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .feedback {
+    font-size: clamp(17px, 2.4vw, 21px);
+    font-weight: 700;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    outline: none;
+  }
+
+  .balance {
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+  }
+
+  .thesis-wrap {
+    width: 100%;
+    padding: 22px 16px 18px;
+    border-top: 1px solid rgba(242, 180, 92, 0.3);
+    border-bottom: 1px solid rgba(242, 180, 92, 0.3);
+  }
+
+  .thesis {
+    font-size: clamp(22px, 4.2vw, 34px);
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: 0.08em;
+    color: var(--amber);
+  }
+
+  .thesis-tag {
+    margin-top: 8px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+
+  .notes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(14, 18, 25, 0.62);
+    border: 1px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .note-tag {
+    align-self: flex-start;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #0d1117;
+    background: var(--amber);
+  }
+
+  .note.mine .note-tag {
+    background: var(--rose);
+  }
+
+  .note p {
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  /* ---------- 手机 ---------- */
+  @media (max-width: 760px) {
+    :root {
+      --chip: 25px;
+    }
+
+    .kicker {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+
+    .uses {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .use {
+      min-height: 132px;
+      padding: 12px 12px 10px;
+    }
+
+    .lower {
+      grid-template-columns: 1fr;
+    }
+
+    .tray,
+    .event-zone {
+      min-height: 140px;
+    }
+
+    .ledger {
+      gap: 6px 14px;
+    }
+
+    .arrived {
+      width: 100%;
+    }
+
+    .l-item b {
+      font-size: 18px;
+    }
+
+    .notes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lamp,
+    .event-q,
+    .use.releasable,
+    .bump {
+      animation: none;
+    }
+
+    .use,
+    .stamp,
+    .event-card,
+    .finale,
+    .btn,
+    .event-btn {
+      transition: none;
+    }
+  }
+</style>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body data-page="buffer">
+
+<header class="top">
+  <a class="back" id="back" href="index.html"><span aria-hidden="true">←</span><span id="backText"></span></a>
+  <span class="kicker" id="kicker"></span>
+</header>
+
+<section class="intro">
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+  <p class="demo"><span id="demoNote"></span><br><span id="chipNote"></span></p>
+</section>
+
+<main class="scene" id="scene" data-phase="arrange">
+  <div class="desk-bg" aria-hidden="true"><div class="lamp"></div></div>
+
+  <div class="scene-inner">
+    <div class="status">
+      <div class="ledger">
+        <span class="arrived" id="arrived"></span>
+        <span class="l-item"><span id="lbTotal"></span><b id="nTotal"></b></span>
+        <span class="l-item"><span id="lbArranged"></span><b id="nArranged"></b></span>
+        <span class="l-item free"><span id="lbFree"></span><b id="nFree"></b></span>
+        <span class="l-item paid" id="paidItem" hidden><span id="lbPaid"></span><b id="nPaid"></b></span>
+      </div>
+      <p class="sum" id="sum" aria-hidden="true"></p>
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </div>
+
+    <div class="uses" id="uses" role="group" aria-label="用途卡"></div>
+
+    <div class="lower">
+      <section class="tray" id="tray" aria-label="暂时不安排">
+        <div class="tray-head">
+          <span class="tray-name" id="trayName"></span>
+          <span class="tray-count" id="trayCount"></span>
+        </div>
+        <span class="tray-sub" id="traySub"></span>
+        <span class="bed" id="freeBed" aria-hidden="true"></span>
+      </section>
+
+      <section class="event-zone" aria-label="计划外的事">
+        <button type="button" class="event-btn" id="eventBtn">
+          <span class="event-q" aria-hidden="true">?</span>
+          <span class="event-btn-text" id="eventBtnText"></span>
+          <span class="ev-sub" id="eventRound"></span>
+        </button>
+
+        <div class="event-card" id="eventCard" hidden>
+          <div class="ev-top">
+            <span class="ev-tag" id="evTag"></span>
+            <span class="ev-status" id="evStatus"></span>
+          </div>
+          <div class="ev-main">
+            <span class="ev-icon" id="evIcon" aria-hidden="true"></span>
+            <p class="ev-text" id="evText"></p>
+          </div>
+          <p class="ev-sub" id="evSub"></p>
+          <span class="bed" id="paidBed" aria-hidden="true"></span>
+          <p class="ev-ledger">
+            <span><span id="lbEvPaid"></span> <b id="evPaid"></b> / <span id="evCost"></span></span>
+            <span class="unpaid"><span id="lbEvUnpaid"></span> <b id="evUnpaid"></b></span>
+          </p>
+          <div class="ev-actions">
+            <button type="button" class="btn primary" id="payBtn"></button>
+            <button type="button" class="btn" id="deferBtn"></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<section class="finale" id="finale" hidden aria-label="发现">
+  <h2 class="feedback" id="feedback" tabindex="-1"></h2>
+  <p class="balance" id="balance"></p>
+  <p class="balance">换一种安排：保留当前情境。换个情境：重置筹码，体验下一件事。</p>
+  <div class="thesis-wrap">
+    <p class="thesis" id="thesis"></p>
+    <p class="thesis-tag" id="thesisTag"></p>
+  </div>
+  <div class="notes" id="notes"></div>
+  <div class="ev-actions">
+    <button type="button" class="btn primary" id="retryBtn"></button>
+    <button type="button" class="btn" id="nextEventBtn"></button>
+  </div>
+</section>
+
+<script>
+/* ==================================================
+   配置区：文案与演示参数集中在这里，便于替换
+   ================================================== */
+var CONFIG = {
+  backHref: "index.html",
+  backText: "返回首页",
+  kicker: "《金钱心理学》× 生活费",
+  title: "这笔钱，先不安排",
+  lead: "生活费刚到账。你会给每一笔钱都安排好用途吗？",
+  demoNote: "生活情境演示：用途、份额与临时事项均为虚构。",
+  chipNote: "筹码仅用于演示关系，不是预算建议。",
+  arrived: "生活费已到账 · 演示份额",
+
+  totalChips: 8,
+  costPerUse: 2,
+
+  uses: [
+    { id: "food", name: "吃饭", note: "基础开支", icon: "bowl", locked: true, preset: true },
+    { id: "books", name: "教材", note: "课程要用", icon: "book" },
+    { id: "wish", name: "想买的东西", note: "一直想买的", icon: "bag" },
+    { id: "outing", name: "和同学外出", note: "周末一起出去", icon: "friends" }
+  ],
+
+  ledger: {
+    total: "总份额",
+    arranged: "已安排",
+    free: "暂未安排",
+    paid: "已支付",
+    sumArrange: "已安排 {a} + 暂未安排 {f} = {t}",
+    sumEvent: "已安排 {a} + 暂未安排 {f} + 已支付 {p} = {t}"
+  },
+
+  tray: {
+    name: "暂时不安排",
+    sub: "留着，还没想好用途",
+    count: "{n} 枚",
+    empty: "这里空着"
+  },
+
+  labels: {
+    locked: "基础开支 · 已放入",
+    assigned: "已安排 · 再点可撤回",
+    empty: "点一下，安排 {n} 枚",
+    release: "点这里，腾出 {n} 枚",
+    paused: "计划还在 · 这次暂缓",
+    none: "这次未安排",
+    kept: "已安排",
+    stamp: "这次暂缓"
+  },
+
+  event: {
+    button: "看看计划外的事",
+    tag: "虚构演示",
+    sub: "需要 {n} 枚 · 也可以晚些再处理",
+    paidLabel: "已支付",
+    unpaidLabel: "仍未支付",
+    defer: "这次先不处理",
+    status: {
+      ask: "要现在处理吗？",
+      short: "还差 {n} 枚",
+      done: "已处理",
+      deferred: "待处理"
+    }
+  },
+
+  events: [
+    { name: "耳机维修", icon: "headphones", text: "耳机突然坏了，这次想修好它。", cost: 3, pay: "现在修好它" },
+    { name: "水杯更换", icon: "cup", text: "水杯摔裂了，这次想换一个。", cost: 2, pay: "现在换一个" },
+    { name: "工作坊机会", icon: "workshop", text: "看到一个感兴趣的校外工作坊，这次想报名参加。", cost: 5, pay: "这次报名参加" }
+  ],
+  nextEvent: "换个情境试试",
+  eventRound: "情境 {n}/{total} · 每轮一件事",
+
+  hints: {
+    arrange: "点用途卡安排，也可以留几枚暂时不安排。",
+    assigned: "「{name}」放入 {n} 枚。",
+    withdrawn: "「{name}」的 {n} 枚回到暂未安排，之后还能再安排。",
+    locked: "吃饭是基础开支，本演示中不撤回。",
+    notEnough: "暂未安排的不够 {n} 枚，可以先撤回一项。",
+    eventShown: "计划外的事来了。现在处理，还是先放一放？",
+    eventFirst: "先决定要不要现在处理。",
+    covered: "这次用到了未安排的部分，原来的安排不用改。",
+    partial: "未安排的部分先付了 {paid} 枚，还差 {short} 枚。要现在处理，你准备从哪项腾出来？",
+    none: "暂未安排的部分是 0，还差 {short} 枚。要现在处理，你准备从哪项腾出来？",
+    lockedPay: "吃饭是基础开支，这里不从它腾挪。",
+    cannotRelease: "这一项没有可腾出的份额。",
+    releaseMore: "「{name}」这次暂缓，{paid} 枚付给临时事项。还差 {short} 枚。",
+    releaseDone: "「{name}」这次暂缓，{paid} 枚付给临时事项{back}。缺口补上了。",
+    releaseBack: "，{n} 枚回到暂未安排",
+    deferredNow: "临时事项先放着，账目保持原样。",
+    locked2: "这一轮已经结束，可以换一种安排再试。",
+    reset: "回到刚到账的时候：同样的份额，同样的计划外的事。"
+  },
+
+  feedback: {
+    covered: "留出的部分够用，这次保住了原来的安排。",
+    adjusted: "留出的部分不够，你调整了{n}项安排。",
+    adjustedNone: "这次没有留出的部分，你调整了{n}项安排。",
+    deferred: "你选择暂时不处理，原来的安排保留了，临时事项仍待处理。",
+    deferredPartial: "留出的部分先付了 {paid} 枚，还差 {unpaid} 枚，你选择这次先不处理；原来的安排保留了。",
+    deferredAdjusted: "你调整了{n}项安排，还差 {unpaid} 枚，你选择这次先不处理。",
+    balanceLeft: "留出余地的同时，有{n}项计划这一轮没有拿到份额。",
+    balanceFull: "这一轮，每项计划都先拿到了份额。"
+  },
+
+  numerals: ["零", "一", "两", "三", "四", "五"],
+
+  thesis: "有些钱，是留给还没想到的事的。",
+  thesisTag: "作品概括",
+
+  sources: [
+    {
+      kind: "book",
+      tag: "书中观点 · 内容概括",
+      text: "《金钱心理学》讨论了不以具体消费目标为前提的储蓄，以及为不确定性保留容错空间。"
+    },
+    {
+      kind: "mine",
+      tag: "我的理解 · 内容概括",
+      text: "我从“存钱要有明确用途”，开始理解“有些钱可以先为未知留着”。"
+    }
+  ],
+
+  retry: "换一种安排再试"
+};
+/* ================== 配置区结束 ================== */
+
+(function () {
+  var C = CONFIG;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var TOTAL = C.totalChips;
+  var eventIndex = 0;
+  var EC = C.events[eventIndex].cost;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function fmt(s, data) {
+    return String(s).replace(/\{(\w+)\}/g, function (m, k) {
+      return data && data[k] !== undefined ? data[k] : m;
+    });
+  }
+
+  function cn(n) {
+    return C.numerals[n] !== undefined ? C.numerals[n] : String(n);
+  }
+
+  var ICONS = {
+    bowl: '<path d="M3 11h18a9 7.5 0 0 1-18 0z"/><path d="M9 7.5c0-1.6 1.6-1.6 1.6-3.4M13.6 7.5c0-1.6 1.6-1.6 1.6-3.4"/>',
+    book: '<path d="M4 5h5.5A2.5 2.5 0 0 1 12 7.5V20a2 2 0 0 0-2-2H4z"/><path d="M20 5h-5.5A2.5 2.5 0 0 0 12 7.5V20a2 2 0 0 1 2-2h6z"/>',
+    bag: '<path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/>',
+    friends: '<circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.4"/><path d="M3 20c0-3.4 2.7-6 6-6s6 2.6 6 6"/><path d="M14.5 14.4c3 0 6 2 6 5.6"/>',
+    headphones: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.6"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.6"/><path d="M11 10l2 2-2 2"/>'
+  };
+
+  ICONS.cup = '<path d="M5 4h12l-1 16H6z"/><path d="M17 7h2a2 2 0 0 1 0 5h-2"/><path d="M11 7l-2 4 3 2-2 4"/>';
+  ICONS.workshop = '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6M9 18v3M15 18v3"/>';
+
+  function icon(k) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[k] || "") + "</svg>";
+  }
+
+  function useCost(u) {
+    return u.cost || C.costPerUse;
+  }
+
+  function useById(id) {
+    for (var i = 0; i < C.uses.length; i++) {
+      if (C.uses[i].id === id) return C.uses[i];
+    }
+    return null;
+  }
+
+  /* ---------- 静态文字 ---------- */
+  $("back").href = C.backHref;
+  $("backText").textContent = C.backText;
+  $("kicker").textContent = C.kicker;
+  $("title").textContent = C.title;
+  $("lead").textContent = C.lead;
+  $("demoNote").textContent = C.demoNote;
+  $("chipNote").textContent = C.chipNote;
+  $("arrived").textContent = C.arrived;
+  $("lbTotal").textContent = C.ledger.total;
+  $("lbArranged").textContent = C.ledger.arranged;
+  $("lbFree").textContent = C.ledger.free;
+  $("lbPaid").textContent = C.ledger.paid;
+  $("trayName").textContent = C.tray.name;
+  $("traySub").textContent = C.tray.sub;
+  $("eventBtnText").textContent = C.event.button;
+  $("evTag").textContent = C.event.tag;
+  $("evSub").textContent = fmt(C.event.sub, { n: EC });
+  $("lbEvPaid").textContent = C.event.paidLabel;
+  $("lbEvUnpaid").textContent = C.event.unpaidLabel;
+  $("evCost").textContent = EC;
+  $("deferBtn").textContent = C.event.defer;
+  $("thesis").textContent = C.thesis;
+  $("thesisTag").textContent = C.thesisTag;
+  $("retryBtn").textContent = C.retry;
+  $("nextEventBtn").textContent = C.nextEvent;
+  $("nTotal").textContent = TOTAL;
+
+  C.sources.forEach(function (s) {
+    var box = document.createElement("article");
+    box.className = "note" + (s.kind === "mine" ? " mine" : "");
+    var tag = document.createElement("span");
+    tag.className = "note-tag";
+    tag.textContent = s.tag;
+    var p = document.createElement("p");
+    p.textContent = s.text;
+    box.appendChild(tag);
+    box.appendChild(p);
+    $("notes").appendChild(box);
+  });
+
+  /* ---------- 用途卡 ---------- */
+  var usesEl = $("uses");
+  var cardEls = {};
+  var beds = {};
+
+  C.uses.forEach(function (u) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "use" + (u.locked ? " locked" : "");
+    b.innerHTML =
+      '<span class="use-head">' +
+        '<span class="use-icon" aria-hidden="true">' + icon(u.icon) + "</span>" +
+        '<span class="use-name"></span>' +
+      "</span>" +
+      '<span class="use-note"></span>' +
+      '<span class="bed" aria-hidden="true"></span>' +
+      '<span class="use-state"></span>' +
+      '<span class="stamp" aria-hidden="true"></span>';
+    b.querySelector(".use-name").textContent = u.name;
+    b.querySelector(".use-note").textContent = u.note || "";
+    b.querySelector(".stamp").textContent = C.labels.stamp;
+    b.addEventListener("click", function () {
+      onUse(u.id);
+    });
+    usesEl.appendChild(b);
+    cardEls[u.id] = b;
+    beds[u.id] = b.querySelector(".bed");
+  });
+
+  beds.free = $("freeBed");
+  beds.paid = $("paidBed");
+
+  /* ---------- 筹码 ---------- */
+  var chips = [];
+  for (var i = 0; i < TOTAL; i++) {
+    var chip = document.createElement("span");
+    chip.className = "chip";
+    chips.push(chip);
+  }
+
+  /* ---------- 状态 ---------- */
+  var state;
+  var busy = false;
+
+  function initialLoc() {
+    var loc = [];
+    C.uses.forEach(function (u) {
+      if (u.preset) {
+        for (var j = 0; j < useCost(u) && loc.length < TOTAL; j++) {
+          loc.push(u.id);
+        }
+      }
+    });
+    while (loc.length < TOTAL) {
+      loc.push("free");
+    }
+    return loc;
+  }
+
+  function freshState() {
+    return {
+      phase: "arrange",
+      loc: initialLoc(),
+      paused: {},
+      adjusted: 0,
+      fromFree: 0,
+      freeAtPay: 0,
+      unassignedAtEvent: 0,
+      outcome: null
+    };
+  }
+
+  state = freshState();
+
+  function count(where) {
+    var n = 0;
+    for (var k = 0; k < state.loc.length; k++) {
+      if (state.loc[k] === where) n++;
+    }
+    return n;
+  }
+
+  function arrangedCount() {
+    return TOTAL - count("free") - count("paid");
+  }
+
+  function moveN(from, to, n) {
+    var moved = 0;
+    for (var k = state.loc.length - 1; k >= 0 && moved < n; k--) {
+      if (state.loc[k] === from) {
+        state.loc[k] = to;
+        moved++;
+      }
+    }
+    return moved;
+  }
+
+  function eventVisible() {
+    return state.phase !== "arrange";
+  }
+
+  /* ---------- 渲染 ---------- */
+  function setNum(el, v) {
+    var s = String(v);
+    if (el.textContent === s) return;
+    el.textContent = s;
+    if (!reduce) {
+      el.classList.remove("bump");
+      void el.offsetWidth;
+      el.classList.add("bump");
+    }
+  }
+
+  function addGaps(bed, n) {
+    for (var k = 0; k < n; k++) {
+      var g = document.createElement("span");
+      g.className = "gap";
+      bed.appendChild(g);
+    }
+  }
+
+  function cardInfo(u) {
+    var n = count(u.id);
+    var p = state.phase;
+    var L = C.labels;
+    if (u.locked) {
+      return { text: L.locked, active: p === "arrange" || p === "pay" };
+    }
+    if (state.paused[u.id]) {
+      return { text: L.paused, active: false };
+    }
+    if (p === "arrange") {
+      return n > 0
+        ? { text: L.assigned, active: true, pressed: true }
+        : { text: fmt(L.empty, { n: useCost(u) }), active: true, pressed: false };
+    }
+    if (p === "pay") {
+      return n > 0
+        ? { text: fmt(L.release, { n: n }), active: true, release: true }
+        : { text: L.none, active: false };
+    }
+    return n > 0 ? { text: L.kept, active: false } : { text: L.none, active: false };
+  }
+
+  function render() {
+    var p = state.phase;
+    var event = C.events[eventIndex];
+    EC = event.cost;
+    $("evIcon").innerHTML = icon(event.icon);
+    $("evText").textContent = event.text;
+    $("evSub").textContent = fmt(C.event.sub, { n: EC });
+    $("evCost").textContent = EC;
+    $("payBtn").textContent = event.pay;
+    $("eventRound").textContent = fmt(C.eventRound, { n: eventIndex + 1, total: C.events.length });
+    $("eventBtn").setAttribute("aria-label", C.event.button + "，情境 " + (eventIndex + 1) + "/" + C.events.length);
+    $("scene").setAttribute("data-phase", p);
+
+    /* 筹码归位 */
+    Object.keys(beds).forEach(function (k) {
+      beds[k].textContent = "";
+    });
+    chips.forEach(function (c, k) {
+      beds[state.loc[k]].appendChild(c);
+    });
+
+    /* 用途卡 */
+    C.uses.forEach(function (u) {
+      var el = cardEls[u.id];
+      var info = cardInfo(u);
+      var n = count(u.id);
+      if (!u.locked && !state.paused[u.id] && n === 0) {
+        addGaps(beds[u.id], useCost(u));
+      }
+      el.querySelector(".use-state").textContent = info.text;
+      el.classList.toggle("paused", !!state.paused[u.id]);
+      el.classList.toggle("releasable", !!info.release);
+      el.classList.toggle("dim", p === "pay" && !info.release && !state.paused[u.id]);
+      el.setAttribute("aria-disabled", info.active ? "false" : "true");
+      if (p === "arrange" && !u.locked) {
+        el.setAttribute("aria-pressed", info.pressed ? "true" : "false");
+      } else {
+        el.removeAttribute("aria-pressed");
+      }
+      el.setAttribute("aria-label", u.name + "，" + (u.note ? u.note + "，" : "") + n + " 枚，" + info.text);
+    });
+
+    /* 留白区 */
+    var free = count("free");
+    $("trayCount").textContent = fmt(C.tray.count, { n: free });
+    if (free === 0) {
+      var empty = document.createElement("span");
+      empty.className = "tray-empty";
+      empty.textContent = C.tray.empty;
+      beds.free.appendChild(empty);
+    }
+    $("tray").setAttribute("aria-label", C.tray.name + "，" + free + " 枚");
+
+    /* 计划外 */
+    var paid = count("paid");
+    var unpaid = EC - paid;
+    var card = $("eventCard");
+    var showEvent = eventVisible();
+    $("eventBtn").hidden = showEvent;
+    if (showEvent && card.hidden) {
+      card.hidden = false;
+      card.classList.remove("show");
+      if (reduce) {
+        card.classList.add("show");
+      } else {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            card.classList.add("show");
+          });
+        });
+      }
+    } else if (!showEvent) {
+      card.classList.remove("show");
+      card.hidden = true;
+    }
+    if (showEvent) {
+      addGaps(beds.paid, unpaid);
+      $("evPaid").textContent = paid;
+      $("evUnpaid").textContent = unpaid;
+      var st = C.event.status;
+      var status = st.ask;
+      if (p === "pay") status = fmt(st.short, { n: unpaid });
+      if (p === "result") status = unpaid === 0 ? st.done : st.deferred;
+      $("evTag").textContent = C.event.tag + " · " + (eventIndex + 1) + "/" + C.events.length;
+      $("evStatus").textContent = status;
+      $("payBtn").hidden = p !== "event";
+      $("deferBtn").hidden = !(p === "event" || p === "pay");
+    }
+
+    /* 账目 */
+    var a = arrangedCount();
+    setNum($("nArranged"), a);
+    setNum($("nFree"), free);
+    $("paidItem").hidden = !showEvent;
+    if (showEvent) setNum($("nPaid"), paid);
+    $("sum").textContent = showEvent
+      ? fmt(C.ledger.sumEvent, { a: a, f: free, p: paid, t: TOTAL })
+      : fmt(C.ledger.sumArrange, { a: a, f: free, t: TOTAL });
+
+    /* 发现 */
+    var finale = $("finale");
+    if (p === "result") {
+      $("feedback").textContent = buildFeedback();
+      $("balance").textContent = state.unassignedAtEvent > 0
+        ? fmt(C.feedback.balanceLeft, { n: cn(state.unassignedAtEvent) })
+        : C.feedback.balanceFull;
+      if (finale.hidden) {
+        finale.hidden = false;
+        finale.classList.remove("show");
+        if (reduce) {
+          finale.classList.add("show");
+        } else {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              finale.classList.add("show");
+            });
+          });
+        }
+      }
+    } else {
+      finale.classList.remove("show");
+      finale.hidden = true;
+    }
+  }
+
+  function buildFeedback() {
+    var F = C.feedback;
+    var paid = count("paid");
+    var unpaid = EC - paid;
+    if (state.outcome === "covered") return F.covered;
+    if (state.outcome === "adjusted") {
+      return fmt(state.freeAtPay > 0 ? F.adjusted : F.adjustedNone, { n: cn(state.adjusted) });
+    }
+    if (paid === 0) return F.deferred;
+    if (state.adjusted > 0) return fmt(F.deferredAdjusted, { n: cn(state.adjusted), unpaid: unpaid });
+    return fmt(F.deferredPartial, { paid: paid, unpaid: unpaid });
+  }
+
+  /* ---------- 带动画的状态变化 ---------- */
+  function transition(mutate, after) {
+    if (busy) return;
+    busy = true;
+    var first = chips.map(function (c) {
+      return c.getBoundingClientRect();
+    });
+    mutate();
+    render();
+
+    var pending = 0;
+    var finished = false;
+
+    function end() {
+      if (finished) return;
+      finished = true;
+      busy = false;
+      if (after) after();
+    }
+
+    if (!reduce && chips[0].animate) {
+      var order = 0;
+      chips.forEach(function (c, k) {
+        var last = c.getBoundingClientRect();
+        var dx = first[k].left - last.left;
+        var dy = first[k].top - last.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+        if (!first[k].width || !last.width) return;
+        pending++;
+        var lift = -Math.min(60, Math.sqrt(dx * dx + dy * dy) * 0.25);
+        c.classList.add("moving");
+        var anim = c.animate(
+          [
+            { transform: "translate(" + dx + "px," + dy + "px) scale(1)" },
+            { transform: "translate(" + dx * 0.5 + "px," + (dy * 0.5 + lift) + "px) scale(1.18)", offset: 0.5 },
+            { transform: "translate(0,0) scale(1)" }
+          ],
+          {
+            duration: 560,
+            delay: order * 70,
+            easing: "cubic-bezier(0.3, 0.7, 0.2, 1)",
+            fill: "backwards"
+          }
+        );
+        order++;
+        var done = function () {
+          c.classList.remove("moving");
+          pending--;
+          if (pending === 0) end();
+        };
+        anim.onfinish = done;
+        anim.oncancel = done;
+      });
+    }
+
+    if (pending === 0) end();
+  }
+
+  function say(msg) {
+    $("hint").textContent = msg;
+  }
+
+  function focusFirstReleasable() {
+    for (var k = 0; k < C.uses.length; k++) {
+      var el = cardEls[C.uses[k].id];
+      if (el.classList.contains("releasable")) {
+        el.focus({ preventScroll: true });
+        return;
+      }
+    }
+    $("deferBtn").focus({ preventScroll: true });
+  }
+
+  function focusFinale() {
+    var fb = $("feedback");
+    fb.focus({ preventScroll: true });
+    setTimeout(function () {
+      $("finale").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+    }, reduce ? 0 : 200);
+  }
+
+  /* ---------- 操作 ---------- */
+  function onUse(id) {
+    if (busy) return;
+    var u = useById(id);
+    var p = state.phase;
+    var cost = useCost(u);
+
+    if (p === "arrange") {
+      if (u.locked) {
+        say(C.hints.locked);
+        return;
+      }
+      var n = count(id);
+      if (n > 0) {
+        transition(function () {
+          moveN(id, "free", n);
+        }, function () {
+          say(fmt(C.hints.withdrawn, { name: u.name, n: n }));
+        });
+      } else if (count("free") >= cost) {
+        transition(function () {
+          moveN("free", id, cost);
+        }, function () {
+          say(fmt(C.hints.assigned, { name: u.name, n: cost }));
+        });
+      } else {
+        say(fmt(C.hints.notEnough, { n: cost }));
+      }
+      return;
+    }
+
+    if (p === "pay") {
+      if (u.locked) {
+        say(C.hints.lockedPay);
+        return;
+      }
+      var have = count(id);
+      if (state.paused[id] || have === 0) {
+        say(C.hints.cannotRelease);
+        return;
+      }
+      var need = EC - count("paid");
+      var toPaid = Math.min(have, need);
+      var toFree = have - toPaid;
+      transition(function () {
+        moveN(id, "paid", toPaid);
+        moveN(id, "free", toFree);
+        state.paused[id] = true;
+        state.adjusted++;
+        if (count("paid") >= EC) {
+          state.phase = "result";
+          state.outcome = "adjusted";
+        }
+      }, function () {
+        if (state.phase === "result") {
+          var back = toFree > 0 ? fmt(C.hints.releaseBack, { n: toFree }) : "";
+          say(fmt(C.hints.releaseDone, { name: u.name, paid: toPaid, back: back }));
+          focusFinale();
+        } else {
+          say(fmt(C.hints.releaseMore, { name: u.name, paid: toPaid, short: EC - count("paid") }));
+          focusFirstReleasable();
+        }
+      });
+      return;
+    }
+
+    if (p === "event") {
+      say(C.hints.eventFirst);
+      return;
+    }
+
+    say(C.hints.locked2);
+  }
+
+  function openEvent() {
+    if (busy || state.phase !== "arrange") return;
+    transition(function () {
+      state.phase = "event";
+      var left = 0;
+      C.uses.forEach(function (u) {
+        if (!u.locked && count(u.id) === 0) left++;
+      });
+      state.unassignedAtEvent = left;
+    }, function () {
+      say(C.hints.eventShown);
+      $("payBtn").focus({ preventScroll: true });
+    });
+  }
+
+  function pay() {
+    if (busy || state.phase !== "event") return;
+    var free = count("free");
+    var take = Math.min(free, EC);
+    transition(function () {
+      state.freeAtPay = free;
+      moveN("free", "paid", take);
+      state.fromFree = take;
+      if (take >= EC) {
+        state.phase = "result";
+        state.outcome = "covered";
+      } else {
+        state.phase = "pay";
+      }
+    }, function () {
+      if (state.phase === "result") {
+        say(C.hints.covered);
+        focusFinale();
+      } else {
+        var short = EC - take;
+        say(take > 0 ? fmt(C.hints.partial, { paid: take, short: short }) : fmt(C.hints.none, { short: short }));
+        focusFirstReleasable();
+      }
+    });
+  }
+
+  function defer() {
+    if (busy || (state.phase !== "event" && state.phase !== "pay")) return;
+    transition(function () {
+      state.phase = "result";
+      state.outcome = "deferred";
+    }, function () {
+      say(C.hints.deferredNow);
+      focusFinale();
+    });
+  }
+
+  function retry(nextEvent) {
+    if (busy) return;
+    transition(function () {
+      if (nextEvent === true) {
+        eventIndex = (eventIndex + 1) % C.events.length;
+        EC = C.events[eventIndex].cost;
+      }
+      state = freshState();
+    }, function () {
+      say(nextEvent === true ? "换到下一个虚构情境：筹码全部重置，先重新安排。" : C.hints.reset);
+      $("scene").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      var firstOpen = C.uses.filter(function (u) {
+        return !u.locked;
+      })[0];
+      if (firstOpen) cardEls[firstOpen.id].focus({ preventScroll: true });
+    });
+  }
+
+  $("eventBtn").addEventListener("click", openEvent);
+  $("payBtn").addEventListener("click", pay);
+  $("deferBtn").addEventListener("click", defer);
+  $("retryBtn").addEventListener("click", function () { retry(false); });
+  $("nextEventBtn").addEventListener("click", function () { retry(true); });
+
+  render();
+  say(C.hints.arrange);
+})();
+</script>
+</body>
+</html>

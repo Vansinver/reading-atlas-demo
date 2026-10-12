@@ -1,0 +1,1261 @@
+<!-- File: game.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>你在玩哪一种游戏｜阅读装置</title>
+<style>
+  :root {
+    --ink: #e9e4d8;
+    --ink-dim: #a39d90;
+    --ink-faint: rgba(233, 228, 216, 0.36);
+    --amber: #f2b45c;
+    --glass-line: rgba(255, 255, 255, 0.09);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    background: #05070b;
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    overflow-x: hidden;
+    background:
+      radial-gradient(ellipse at 22% 78%, rgba(242, 180, 92, 0.16) 0%, transparent 45%),
+      radial-gradient(ellipse at 50% 40%, rgba(40, 52, 72, 0.35) 0%, transparent 60%),
+      #05070b;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: max(18px, env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 0;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-line);
+    background: rgba(14, 18, 25, 0.6);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    transition: border-color 0.3s;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    border-color: rgba(242, 180, 92, 0.55);
+    outline: none;
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 6px 12px;
+    border: 1px solid rgba(242, 180, 92, 0.5);
+    border-radius: 999px;
+    color: var(--amber);
+    background: rgba(242, 180, 92, 0.08);
+    white-space: nowrap;
+  }
+
+  .intro {
+    text-align: center;
+    padding: clamp(14px, 3vh, 28px) 16px 0;
+  }
+
+  .intro h1 {
+    font-size: clamp(24px, 4.6vw, 40px);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .intro .lead {
+    margin: 12px auto 0;
+    max-width: 34em;
+    font-size: clamp(14px, 2vw, 17px);
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
+  .intro .demo {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- 书桌舞台 ---------- */
+  .stage {
+    position: relative;
+    width: min(1100px, 100% - 24px);
+    height: clamp(400px, 60vh, 620px);
+    margin: clamp(14px, 3vh, 26px) auto 0;
+  }
+
+  .desk {
+    position: absolute;
+    left: -4%;
+    right: -4%;
+    bottom: -6%;
+    height: 36%;
+    clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+    background:
+      radial-gradient(ellipse at 18% 10%, rgba(242, 180, 92, 0.28) 0%, transparent 50%),
+      linear-gradient(to bottom, #2a2119 0%, #17120d 70%, #0d0a07 100%);
+    pointer-events: none;
+  }
+
+  .desk::before {
+    content: "";
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(242, 180, 92, 0.5), transparent);
+  }
+
+  .lamp {
+    position: absolute;
+    left: 6%;
+    bottom: 22%;
+    width: 46%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242, 180, 92, 0.18) 0%, transparent 62%);
+    animation: breathe 7s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* ---------- 屏幕 ---------- */
+  .screen {
+    position: absolute;
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition:
+      top 0.7s var(--ease),
+      left 0.7s var(--ease),
+      width 0.7s var(--ease),
+      height 0.7s var(--ease),
+      transform 0.7s var(--ease),
+      opacity 0.5s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .screen:disabled {
+    cursor: default;
+  }
+
+  .screen::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -16px;
+    width: 14%;
+    height: 16px;
+    transform: translateX(-50%);
+    background: linear-gradient(#2a2f37, #111418);
+    border-radius: 0 0 4px 4px;
+  }
+
+  .bezel {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 6px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, #3a3f48, #14171c 60%, #22262d);
+    box-shadow:
+      0 0 36px var(--glow),
+      0 18px 40px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: box-shadow 0.6s ease;
+  }
+
+  .screen:focus-visible .bezel {
+    box-shadow:
+      0 0 0 3px rgba(143, 211, 232, 0.75),
+      0 0 36px var(--glow),
+      0 18px 40px rgba(0, 0, 0, 0.55);
+  }
+
+  .display {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 11px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 30% 20%, var(--soft) 0%, transparent 70%),
+      rgba(12, 16, 22, 0.94);
+  }
+
+  .tint {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: radial-gradient(ellipse at 50% 30%, var(--ic, transparent) 0%, transparent 75%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .scan {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background:
+      linear-gradient(118deg, rgba(255, 255, 255, 0.12) 0%, transparent 30%),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 8% 9%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, transform 0.6s var(--ease), visibility 0s linear 0.45s;
+  }
+
+  .tag {
+    align-self: flex-start;
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #0d1117;
+    background: var(--c);
+  }
+
+  /* 选择面 */
+  .c-name {
+    font-size: clamp(18px, 2.2vw, 26px);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--c);
+  }
+
+  .c-open {
+    align-self: flex-start;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--ink-dim);
+    animation: nudge 2.4s ease-in-out infinite;
+  }
+
+  @keyframes nudge {
+    0%, 100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* 主屏面 */
+  .face-main {
+    padding-bottom: 22%;
+  }
+
+  .m-name {
+    font-size: clamp(24px, 3.4vw, 40px);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--c);
+  }
+
+  .todo {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-line);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .box {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--c);
+  }
+
+  .todo-text {
+    flex: 1;
+    font-size: clamp(14px, 1.6vw, 17px);
+    line-height: 1.5;
+  }
+
+  .todo-state {
+    flex: none;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-dim);
+  }
+
+  .unchanged {
+    align-self: flex-start;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px dashed var(--c);
+    color: var(--c);
+    opacity: 0;
+    transition: opacity 0.4s ease 0.4s;
+  }
+
+  /* 邻近屏面 */
+  .face-side {
+    justify-content: center;
+    align-items: stretch;
+    padding: 9%;
+  }
+
+  .bubble {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--soft);
+    border: 1px solid var(--c);
+    box-shadow: 0 0 24px var(--glow);
+    animation: ping 1.8s ease-in-out infinite;
+    transition: opacity 0.3s ease;
+  }
+
+  @keyframes ping {
+    0%, 100% {
+      box-shadow: 0 0 10px var(--glow);
+    }
+    50% {
+      box-shadow: 0 0 32px var(--glow);
+    }
+  }
+
+  .b-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--c);
+  }
+
+  .b-text {
+    font-size: clamp(13px, 1.4vw, 16px);
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .tap {
+    align-self: center;
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    color: var(--ink-dim);
+    animation: nudge 1.8s ease-in-out infinite;
+  }
+
+  .screen.taken .bubble,
+  .screen.taken .tap {
+    opacity: 0;
+  }
+
+  /* 记分牌 */
+  .board {
+    position: absolute;
+    top: 6%;
+    left: 6%;
+    right: 6%;
+    height: 54%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 4% 6%;
+    border-radius: 14px;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+      var(--bsoft);
+    border: 2px solid var(--bc);
+    box-shadow: 0 0 48px var(--bglow), 0 12px 30px rgba(0, 0, 0, 0.5);
+    color: var(--ink);
+    z-index: 3;
+    transform-origin: 0 0;
+  }
+
+  .board .tag {
+    background: var(--bc);
+  }
+
+  .board-label {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--bc);
+  }
+
+  .board-text {
+    font-size: clamp(18px, 2.6vw, 30px);
+    font-weight: 800;
+    line-height: 1.35;
+  }
+
+  .board-cheer {
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* 问题 */
+  .question {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 6%;
+    display: block;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(242, 180, 92, 0.1);
+    border: 1px solid rgba(242, 180, 92, 0.5);
+    font-size: clamp(14px, 1.7vw, 18px);
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: var(--amber);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+  }
+
+  /* ---------- 角色位置（电脑） ---------- */
+  .screen[data-role="a"],
+  .screen[data-role="b"],
+  .screen[data-role="c"] {
+    top: 16%;
+    width: 28%;
+    height: 48%;
+  }
+
+  .screen[data-role="a"] {
+    left: 3%;
+  }
+
+  .screen[data-role="b"] {
+    left: 36%;
+  }
+
+  .screen[data-role="c"] {
+    left: 69%;
+  }
+
+  .screen[data-role="main"] {
+    left: 24%;
+    top: 0;
+    width: 52%;
+    height: 76%;
+    z-index: 2;
+  }
+
+  .screen[data-role="l"],
+  .screen[data-role="r"] {
+    top: 28%;
+    width: 21%;
+    height: 42%;
+  }
+
+  .screen[data-role="l"] {
+    left: 0;
+    transform: perspective(900px) rotateY(22deg);
+  }
+
+  .screen[data-role="r"] {
+    left: 79%;
+    transform: perspective(900px) rotateY(-22deg);
+  }
+
+  .stage[data-phase="choose"] .screen:hover,
+  .stage[data-phase="choose"] .screen:focus-visible {
+    transform: translateY(-6px);
+  }
+
+  .stage[data-phase="crowd"] .screen[data-role="l"],
+  .stage[data-phase="crowd"] .screen[data-role="r"] {
+    opacity: 0.6;
+  }
+
+  /* 面的显示 */
+  .screen[data-role="a"] .face-choose,
+  .screen[data-role="b"] .face-choose,
+  .screen[data-role="c"] .face-choose,
+  .screen[data-role="main"] .face-main,
+  .screen[data-role="l"] .face-side,
+  .screen[data-role="r"] .face-side {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.45s ease 0.25s, transform 0.6s var(--ease), visibility 0s;
+  }
+
+  .screen[data-role="main"] .bezel {
+    box-shadow:
+      0 0 70px var(--glow),
+      0 24px 50px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  /* 记分牌挤占 */
+  .stage[data-phase="crowd"] .screen[data-role="main"] .face-main {
+    transform: translateY(34%) scale(0.88);
+    opacity: 0.5;
+  }
+
+  .stage[data-phase="crowd"] .screen[data-role="main"] .m-name,
+  .stage[data-phase="crowd"] .screen[data-role="main"] .face-main > .tag {
+    opacity: 0.25;
+  }
+
+  .stage[data-phase="crowd"] .screen[data-role="main"] .unchanged {
+    opacity: 1;
+  }
+
+  .stage[data-phase="crowd"] .screen[data-role="main"] .tint {
+    opacity: 1;
+  }
+
+  .stage[data-phase="crowd"] .screen[data-role="main"] .bezel {
+    box-shadow:
+      0 0 70px var(--icglow, transparent),
+      0 24px 50px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .stage[data-phase="return"] .screen[data-role="main"] .question {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- 控制区 ---------- */
+  .controls {
+    width: min(720px, 100% - 32px);
+    margin: clamp(28px, 4vh, 40px) auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .hint {
+    font-size: clamp(14px, 2vw, 16px);
+    letter-spacing: 0.1em;
+    min-height: 1.5em;
+    line-height: 1.7;
+  }
+
+  .sub {
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+    line-height: 1.7;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 180, 92, 0.55);
+    background: rgba(242, 180, 92, 0.1);
+    color: var(--amber);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .btn.primary {
+    background: var(--amber);
+    color: #0d1117;
+    font-weight: 700;
+    animation: halo 2s ease-in-out infinite;
+  }
+
+  @keyframes halo {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(242, 180, 92, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(242, 180, 92, 0);
+    }
+  }
+
+  .btn:hover {
+    background: rgba(242, 180, 92, 0.22);
+  }
+
+  .btn.primary:hover {
+    background: #f6c47a;
+  }
+
+  .btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(143, 211, 232, 0.75);
+  }
+
+  /* ---------- 注明 ---------- */
+  .notes {
+    width: min(720px, 100% - 32px);
+    margin: 22px auto max(32px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .notes.show {
+    opacity: 1;
+    transform: none;
+  }
+
+  .note {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(14, 18, 25, 0.62);
+    border: 1px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note .tag {
+    background: var(--amber);
+  }
+
+  .note.assoc .tag {
+    background: #e79a8f;
+  }
+
+  .note p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+
+  /* ---------- 手机 ---------- */
+  @media (max-width: 720px) {
+    .kicker {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+
+    .stage {
+      height: clamp(520px, 74vh, 700px);
+    }
+
+    .desk {
+      height: 22%;
+      opacity: 0.7;
+    }
+
+    .screen::after {
+      display: none;
+    }
+
+    .screen[data-role="a"],
+    .screen[data-role="b"],
+    .screen[data-role="c"] {
+      left: 5%;
+      width: 90%;
+      height: 28%;
+    }
+
+    .screen[data-role="a"] {
+      top: 1%;
+    }
+
+    .screen[data-role="b"] {
+      top: 34%;
+    }
+
+    .screen[data-role="c"] {
+      top: 67%;
+    }
+
+    .screen[data-role="main"] {
+      left: 2%;
+      top: 0;
+      width: 96%;
+      height: 62%;
+    }
+
+    .screen[data-role="l"],
+    .screen[data-role="r"] {
+      top: 66%;
+      width: 47%;
+      height: 32%;
+      transform: none;
+    }
+
+    .screen[data-role="l"] {
+      left: 2%;
+    }
+
+    .screen[data-role="r"] {
+      left: 51%;
+    }
+
+    .face-choose {
+      padding: 5% 7%;
+    }
+
+    .c-name {
+      font-size: 22px;
+    }
+
+    .face-side {
+      padding: 8%;
+    }
+
+    .bubble {
+      padding: 10px;
+    }
+
+    .tap {
+      margin-top: 6px;
+    }
+
+    .notes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lamp,
+    .c-open,
+    .bubble,
+    .tap,
+    .btn.primary {
+      animation: none;
+    }
+
+    .screen,
+    .face,
+    .question,
+    .notes,
+    .tint,
+    .unchanged {
+      transition: none;
+    }
+  }
+</style>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body data-page="game">
+
+<header class="top">
+  <a class="back" id="back" href="index.html"><span aria-hidden="true">←</span><span id="backText"></span></a>
+  <span class="kicker" id="kicker"></span>
+</header>
+
+<section class="intro">
+  <h1 id="title"></h1>
+  <p class="demo" id="demoNote"></p>
+  <p class="lead" id="sceneLead"></p>
+</section>
+
+<main class="stage" id="stage" data-phase="choose" role="group" aria-label="大学书桌上的屏幕">
+  <div class="lamp" aria-hidden="true"></div>
+  <div class="desk" aria-hidden="true"></div>
+</main>
+
+<section class="controls">
+  <p class="hint" id="hint" aria-live="polite"></p>
+  <p class="sub" id="sub"></p>
+  <div class="actions">
+    <button type="button" class="btn primary" id="returnBtn" hidden></button>
+    <button type="button" class="btn" id="restartBtn" hidden></button>
+  </div>
+  <p class="sr-only" id="live" aria-live="polite"></p>
+</section>
+
+<section class="notes" id="notes" aria-label="内容依据"></section>
+
+<script>
+/* ==================================================
+   配置区：替换文字、目标、事项与消息只需修改这里
+   ================================================== */
+var CONFIG = {
+  backHref: "index.html",
+  backText: "返回首页",
+  kicker: "《金钱心理学》× 大学书桌",
+  title: "你在玩哪一种游戏",
+  demoNote: "互动情境：目标、事项与消息均为设计示例。",
+  sceneLead: "同一间宿舍，每个人想赢的事不一样。",
+  coexistNote: "这些目标可以同时存在，这里一次只看一个。",
+  chooseTag: "演示目标",
+  chooseOpen: "点开 ↗",
+  mainTag: "我的演示目标",
+  todoState: "待完成",
+  unchanged: "你的事项：没有变化",
+  sideTap: "看看这条消息",
+  boardTag: "别人的记分牌",
+  hints: {
+    choose: "你最近最想完成哪件事？选一块屏幕。",
+    focus: "你选好了目标。旁边的人，也传来了他们的好消息。",
+    crowd: "别人的好消息，占满了你的屏幕。你原本要做的事，还在那里。",
+    back: "回到自己的目标，再看看这条消息是否与你有关。"
+  },
+  guidance: {
+    focus: "点开旁边的一条消息，看看它会怎样占据你的注意力。",
+    crowd: "点击“回到我的目标”，重新看看自己的待办。",
+    back: "别人的成绩可以参考；衡量自己之前，先看看目标是否相同。"
+  },
+  returnLabel: "回到我的目标",
+  restartLabel: "换一个目标",
+  question: "这条评价，能帮你判断眼前的目标吗？",
+  sources: [
+    {
+      kind: "book",
+      tag: "书中观点 · 内容概括",
+      text: "《金钱心理学》第16章提醒读者：先弄清自己参与的是哪一种游戏；对来自不同目标、不同时间尺度的人的建议，要谨慎对待。"
+    },
+    {
+      kind: "assoc",
+      tag: "我的大学生活联想 · 内容概括",
+      text: "同学们的方向各不相同，升学、创业等选择不能简单套用同一种标准。"
+    }
+  ],
+  goals: [
+    {
+      name: "准备升学",
+      color: "#8fd3e8",
+      todo: "整理一门专业课的复习清单",
+      board: {
+        label: "升学的记分牌",
+        text: "这次考试又名列前茅",
+        cheer: "大家都在夸"
+      }
+    },
+    {
+      name: "完成一个作品",
+      color: "#f2b45c",
+      todo: "做出作品第一个能演示的版本",
+      board: {
+        label: "作品的记分牌",
+        text: "这个作品被很多人转发了",
+        cheer: "评论区一片叫好"
+      }
+    },
+    {
+      name: "寻找合适的工作",
+      color: "#e79a8f",
+      todo: "列出想深入了解的岗位方向",
+      board: {
+        label: "求职的记分牌",
+        text: "已经收到实习录用通知",
+        cheer: "群里都在恭喜"
+      }
+    }
+  ]
+};
+/* ================== 配置区结束 ================== */
+
+(function () {
+  var C = CONFIG;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var stage = document.getElementById("stage");
+  var hint = document.getElementById("hint");
+  var sub = document.getElementById("sub");
+  var live = document.getElementById("live");
+  var returnBtn = document.getElementById("returnBtn");
+  var restartBtn = document.getElementById("restartBtn");
+  var notes = document.getElementById("notes");
+
+  /* ---------- 基础文字 ---------- */
+  document.getElementById("back").href = C.backHref;
+  document.getElementById("backText").textContent = C.backText;
+  document.getElementById("kicker").textContent = C.kicker;
+  document.getElementById("title").textContent = C.title;
+  document.getElementById("demoNote").textContent = C.demoNote;
+  document.getElementById("sceneLead").textContent = C.sceneLead;
+  returnBtn.textContent = C.returnLabel;
+  restartBtn.textContent = C.restartLabel;
+
+  C.sources.forEach(function (s) {
+    var box = document.createElement("article");
+    box.className = "note" + (s.kind === "assoc" ? " assoc" : "");
+    var tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = s.tag;
+    var p = document.createElement("p");
+    p.textContent = s.text;
+    box.appendChild(tag);
+    box.appendChild(p);
+    notes.appendChild(box);
+  });
+
+  function rgba(hex, a) {
+    var h = hex.replace("#", "");
+    if (h.length === 3) {
+      h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    }
+    var n = parseInt(h, 16);
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  /* ---------- 建立屏幕 ---------- */
+  var screens = [];
+
+  C.goals.forEach(function (g, i) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "screen";
+    btn.style.setProperty("--c", g.color);
+    btn.style.setProperty("--glow", rgba(g.color, 0.4));
+    btn.style.setProperty("--soft", rgba(g.color, 0.14));
+
+    btn.innerHTML =
+      '<span class="bezel"><span class="display">' +
+        '<span class="tint"></span>' +
+        '<span class="face face-choose">' +
+          '<span class="tag"></span>' +
+          '<span class="c-name"></span>' +
+          '<span class="c-open"></span>' +
+        '</span>' +
+        '<span class="face face-main">' +
+          '<span class="tag"></span>' +
+          '<span class="m-name"></span>' +
+          '<span class="todo">' +
+            '<span class="box" aria-hidden="true"></span>' +
+            '<span class="todo-text"></span>' +
+            '<span class="todo-state"></span>' +
+          '</span>' +
+          '<span class="unchanged"></span>' +
+        '</span>' +
+        '<span class="face face-side">' +
+          '<span class="bubble">' +
+            '<span class="b-label"></span>' +
+            '<span class="b-text"></span>' +
+          '</span>' +
+          '<span class="tap"></span>' +
+        '</span>' +
+        '<span class="question"></span>' +
+        '<span class="scan"></span>' +
+      '</span></span>';
+
+    btn.querySelector(".face-choose .tag").textContent = C.chooseTag;
+    btn.querySelector(".c-name").textContent = g.name;
+    btn.querySelector(".c-open").textContent = C.chooseOpen;
+    btn.querySelector(".face-main .tag").textContent = C.mainTag;
+    btn.querySelector(".m-name").textContent = g.name;
+    btn.querySelector(".todo-text").textContent = g.todo;
+    btn.querySelector(".todo-state").textContent = C.todoState;
+    btn.querySelector(".unchanged").textContent = C.unchanged;
+    btn.querySelector(".b-label").textContent = g.board.label;
+    btn.querySelector(".b-text").textContent = g.board.text;
+    btn.querySelector(".tap").textContent = C.sideTap;
+    btn.querySelector(".question").textContent = C.question;
+
+    btn.addEventListener("click", function () {
+      onScreen(i);
+    });
+
+    stage.appendChild(btn);
+    screens.push(btn);
+  });
+
+  /* ---------- 记分牌 ---------- */
+  var board = document.createElement("span");
+  board.className = "board";
+  board.hidden = true;
+  board.setAttribute("aria-hidden", "true");
+  board.innerHTML =
+    '<span class="tag"></span>' +
+    '<span class="board-label"></span>' +
+    '<span class="board-text"></span>' +
+    '<span class="board-cheer"></span>';
+  board.querySelector(".tag").textContent = C.boardTag;
+
+  /* ---------- 状态 ---------- */
+  var state = {
+    phase: "choose",
+    main: -1,
+    sides: [],
+    active: -1,
+    seen: false,
+    busy: false
+  };
+
+  function setRoles() {
+    if (state.phase === "choose") {
+      var abc = ["a", "b", "c"];
+      screens.forEach(function (s, i) {
+        s.setAttribute("data-role", abc[i % 3]);
+      });
+      return;
+    }
+    screens.forEach(function (s, i) {
+      if (i === state.main) {
+        s.setAttribute("data-role", "main");
+      } else if (i === state.sides[0]) {
+        s.setAttribute("data-role", "l");
+      } else {
+        s.setAttribute("data-role", "r");
+      }
+    });
+  }
+
+  function update() {
+    stage.setAttribute("data-phase", state.phase);
+    setRoles();
+
+    var p = state.phase;
+    hint.textContent = C.hints[p === "return" ? "back" : p];
+    sub.textContent = p === "choose" ? C.coexistNote : C.guidance[p === "return" ? "back" : p];
+    sub.hidden = !sub.textContent;
+    returnBtn.hidden = p !== "crowd";
+    restartBtn.hidden = p === "choose";
+    notes.classList.toggle("show", state.seen);
+
+    screens.forEach(function (s, i) {
+      var g = C.goals[i];
+      var isMain = i === state.main;
+      if (p === "choose") {
+        s.disabled = false;
+        s.setAttribute("aria-label", "选择演示目标：" + g.name);
+      } else if (p === "crowd") {
+        s.disabled = true;
+        s.setAttribute("aria-label", isMain ? "我的演示目标：" + g.name + "，事项：" + g.todo : g.board.label);
+      } else {
+        s.disabled = isMain;
+        s.setAttribute(
+          "aria-label",
+          isMain
+            ? "我的演示目标：" + g.name + "，事项：" + g.todo + "，" + C.todoState
+            : "邻近屏幕消息，" + g.board.label + "：" + g.board.text
+        );
+      }
+    });
+  }
+
+  function fly(fromRect, toRect, reverse, done) {
+    if (reduce || !board.animate || !toRect.width || !toRect.height) {
+      done();
+      return;
+    }
+    var dx = fromRect.left - toRect.left;
+    var dy = fromRect.top - toRect.top;
+    var sx = fromRect.width / toRect.width;
+    var sy = fromRect.height / toRect.height;
+    var away = "translate(" + dx + "px," + dy + "px) scale(" + sx + "," + sy + ")";
+    var frames = [
+      { transform: away, opacity: 0.5 },
+      { transform: "translate(0,0) scale(1,1)", opacity: 1 }
+    ];
+    if (reverse) {
+      frames.reverse();
+    }
+    var anim = board.animate(frames, {
+      duration: reverse ? 520 : 680,
+      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      fill: "both"
+    });
+    anim.onfinish = function () {
+      done();
+      anim.cancel();
+    };
+  }
+
+  function choose(i) {
+    state.main = i;
+    state.sides = [];
+    screens.forEach(function (s, k) {
+      if (k !== i) {
+        state.sides.push(k);
+      }
+    });
+    state.phase = "focus";
+    update();
+    live.textContent = C.mainTag + "：" + C.goals[i].name + "。事项：" + C.goals[i].todo;
+    setTimeout(function () {
+      var first = screens[state.sides[0]];
+      if (first && !first.disabled) {
+        first.focus({ preventScroll: true });
+      }
+    }, reduce ? 0 : 720);
+  }
+
+  function invade(i) {
+    if (state.busy) return;
+    state.busy = true;
+    state.active = i;
+
+    var g = C.goals[i];
+    var main = screens[state.main];
+    var side = screens[i];
+
+    board.style.setProperty("--bc", g.color);
+    board.style.setProperty("--bglow", rgba(g.color, 0.55));
+    board.style.setProperty("--bsoft", rgba(g.color, 0.2));
+    board.querySelector(".board-label").textContent = g.board.label;
+    board.querySelector(".board-text").textContent = g.board.text;
+    board.querySelector(".board-cheer").textContent = g.board.cheer;
+
+    main.style.setProperty("--ic", rgba(g.color, 0.3));
+    main.style.setProperty("--icglow", rgba(g.color, 0.55));
+
+    var fromRect = side.querySelector(".bubble").getBoundingClientRect();
+    main.querySelector(".display").appendChild(board);
+    board.hidden = false;
+
+    side.classList.add("taken");
+    state.phase = "crowd";
+    update();
+    live.textContent = C.boardTag + "：" + g.board.text + "。" + C.unchanged;
+
+    var toRect = board.getBoundingClientRect();
+    fly(fromRect, toRect, false, function () {
+      state.busy = false;
+      returnBtn.focus({ preventScroll: true });
+    });
+  }
+
+  function restore() {
+    if (state.phase !== "crowd" || state.busy) return;
+    state.busy = true;
+    var side = screens[state.active];
+    var fromRect = side.querySelector(".bubble").getBoundingClientRect();
+    var toRect = board.getBoundingClientRect();
+
+    fly(fromRect, toRect, true, function () {
+      board.hidden = true;
+      side.classList.remove("taken");
+      state.phase = "return";
+      state.seen = true;
+      state.busy = false;
+      update();
+      live.textContent = C.question;
+      restartBtn.focus({ preventScroll: true });
+    });
+  }
+
+  function restart() {
+    if (state.busy) return;
+    board.hidden = true;
+    screens.forEach(function (s) {
+      s.classList.remove("taken");
+    });
+    state.phase = "choose";
+    state.main = -1;
+    state.sides = [];
+    state.active = -1;
+    update();
+    setTimeout(function () {
+      screens[0].focus({ preventScroll: true });
+    }, reduce ? 0 : 720);
+  }
+
+  function onScreen(i) {
+    if (state.busy) return;
+    if (state.phase === "choose") {
+      choose(i);
+    } else if ((state.phase === "focus" || state.phase === "return") && i !== state.main) {
+      invade(i);
+    }
+  }
+
+  returnBtn.addEventListener("click", restore);
+  restartBtn.addEventListener("click", restart);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && state.phase === "crowd") {
+      e.preventDefault();
+      restore();
+    }
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

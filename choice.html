@@ -1,0 +1,1559 @@
+<!-- File: choice.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>你想怎么做？｜阅读装置</title>
+<style>
+  :root {
+    --ink: #e9e4d8;
+    --ink-dim: #c5beaf;
+    --ink-faint: #aaa394;
+    --amber: #f2b45c;
+    --amber-soft: rgba(242, 180, 92, 0.12);
+    --rose: #e79a8f;
+    --cyan: #8fd3e8;
+    --paper: #f1e6c6;
+    --paper-ink: #2b241b;
+    --paper-dim: #6f6352;
+    --glass: rgba(12, 16, 22, 0.78);
+    --glass-line: rgba(255, 255, 255, 0.09);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+    background: #05070b;
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    overflow-x: hidden;
+    background:
+      radial-gradient(ellipse at 75% 25%, rgba(242, 180, 92, 0.1) 0%, transparent 45%),
+      radial-gradient(ellipse at 25% 80%, rgba(40, 52, 72, 0.38) 0%, transparent 60%),
+      #05070b;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: max(18px, env(safe-area-inset-top)) clamp(16px, 4vw, 48px) 0;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-line);
+    background: rgba(14, 18, 25, 0.6);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    border-color: rgba(242, 180, 92, 0.55);
+  }
+
+  .back:focus-visible {
+    box-shadow: 0 0 0 3px rgba(143, 211, 232, 0.7);
+  }
+
+  .kicker {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 6px 12px;
+    border: 1px solid rgba(242, 180, 92, 0.5);
+    border-radius: 999px;
+    color: var(--amber);
+    background: var(--amber-soft);
+    white-space: nowrap;
+  }
+
+  /* ---------- 开场 ---------- */
+  .intro {
+    text-align: center;
+    padding: clamp(16px, 3.5vh, 30px) 16px 0;
+  }
+
+  .demo {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px dashed rgba(233, 228, 216, 0.25);
+    color: var(--ink-dim);
+  }
+
+  .intro h1 {
+    margin-top: 14px;
+    font-size: clamp(26px, 5vw, 42px);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .lead {
+    margin-top: 10px;
+    font-size: clamp(15px, 2.2vw, 19px);
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+
+  .hint {
+    margin-top: 10px;
+    min-height: 1.6em;
+    font-size: 13.5px;
+    color: var(--amber);
+    letter-spacing: 0.06em;
+  }
+
+  /* ---------- 书桌 ---------- */
+  .scene {
+    position: relative;
+    width: min(1000px, 100% - 24px);
+    margin: clamp(14px, 2.6vh, 24px) auto 0;
+    padding: clamp(18px, 3vw, 36px) clamp(12px, 3vw, 36px);
+  }
+
+  .desk {
+    position: absolute;
+    inset: 0;
+    border-radius: 26px;
+    overflow: hidden;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(91deg, rgba(255, 255, 255, 0.018) 0 2px, transparent 2px 11px),
+      linear-gradient(172deg, #2a2119 0%, #1a140f 62%, #100c09 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(242, 180, 92, 0.28),
+      0 30px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  .lamp {
+    position: absolute;
+    right: -12%;
+    top: -35%;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(242, 180, 92, 0.24) 0%, rgba(242, 180, 92, 0.05) 40%, transparent 65%);
+    animation: breathe 8s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      opacity: 0.75;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .layout {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 390px) minmax(0, 320px);
+    justify-content: center;
+    align-items: start;
+    gap: clamp(20px, 4vw, 48px);
+  }
+
+  /* ---------- 手机 ---------- */
+  .phone {
+    position: relative;
+    width: 100%;
+    padding: 10px;
+    border-radius: 40px;
+    background: linear-gradient(160deg, #3a3f48, #14171c 55%, #22262d);
+    box-shadow:
+      0 30px 60px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    rotate: -1.2deg;
+  }
+
+  .screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 31px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(242, 180, 92, 0.08), transparent 55%),
+      #0b0f15;
+  }
+
+  .notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 84px;
+    height: 20px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #05070b;
+    z-index: 3;
+  }
+
+  .chat-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 36px 16px 12px;
+    border-bottom: 1px solid var(--glass-line);
+    background: rgba(14, 18, 25, 0.9);
+  }
+
+  .avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(140deg, #3b4658, #222a36);
+    border: 1px solid rgba(143, 211, 232, 0.4);
+    color: var(--cyan);
+    font-weight: 800;
+    font-size: 15px;
+  }
+
+  .who {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .who-name {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .who-name small {
+    margin-left: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #0d1117;
+    background: var(--rose);
+    vertical-align: 2px;
+  }
+
+  .who-status {
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .pre-status {
+    margin: 10px 12px 0;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: rgba(143, 211, 232, 0.08);
+    border: 1px solid rgba(143, 211, 232, 0.3);
+  }
+
+  .log {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: clamp(220px, 34vh, 320px);
+    padding: 14px 12px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  .empty-log {
+    margin: auto;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  .msg {
+    max-width: 84%;
+    padding: 10px 13px;
+    font-size: 14px;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    animation: pop 0.38s var(--ease);
+  }
+
+  .msg.me {
+    align-self: flex-end;
+    border-radius: 16px 16px 4px 16px;
+    background: linear-gradient(160deg, #f6c47a, #e9a648);
+    color: #1a140d;
+  }
+
+  .msg.them {
+    align-self: flex-start;
+    border-radius: 16px 16px 16px 4px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-line);
+  }
+
+  .msg.system {
+    align-self: center;
+    max-width: 92%;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--ink-dim);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(233, 228, 216, 0.2);
+  }
+
+  .msg.system.mark {
+    color: var(--amber);
+    border-color: rgba(242, 180, 92, 0.45);
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .typing {
+    align-self: flex-start;
+    display: inline-flex;
+    gap: 5px;
+    padding: 12px 14px;
+    border-radius: 16px 16px 16px 4px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--glass-line);
+  }
+
+  .typing i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+    animation: dot 1s ease-in-out infinite;
+  }
+
+  .typing i:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .typing i:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes dot {
+    0%, 100% {
+      opacity: 0.3;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  /* 对方提出方式后的选择 */
+  .offer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+
+  /* ---------- 输入区 ---------- */
+  .composer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 12px 16px;
+    border-top: 1px solid var(--glass-line);
+    background: rgba(14, 18, 25, 0.92);
+  }
+
+  .draft-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+
+  .draft-meta {
+    letter-spacing: 0.04em;
+    color: var(--amber);
+  }
+
+  .draft {
+    padding: 10px 13px;
+    border-radius: 14px;
+    border: 1.5px dashed rgba(242, 180, 92, 0.5);
+    background: rgba(242, 180, 92, 0.06);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 3.2em;
+  }
+
+  .draft.flash {
+    animation: flash 0.5s ease;
+  }
+
+  @keyframes flash {
+    0% {
+      background: rgba(242, 180, 92, 0.24);
+    }
+    100% {
+      background: rgba(242, 180, 92, 0.06);
+    }
+  }
+
+  .opt-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+  }
+
+  .opts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-line);
+    background: rgba(255, 255, 255, 0.03);
+    text-align: left;
+    font-size: 13.5px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.25s, border-color 0.25s;
+  }
+
+  .opt .mk {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(242, 180, 92, 0.6);
+    color: var(--amber);
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .opt[aria-pressed="true"] {
+    border-color: rgba(242, 180, 92, 0.7);
+    background: rgba(242, 180, 92, 0.14);
+  }
+
+  .opt[aria-pressed="true"] .mk {
+    background: var(--amber);
+    color: #1a140d;
+  }
+
+  .opt:hover:not(:disabled) {
+    border-color: rgba(242, 180, 92, 0.55);
+  }
+
+  .opt:focus-visible {
+    box-shadow: 0 0 0 3px var(--cyan);
+  }
+
+  .opt:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ---------- 按钮 ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 180, 92, 0.55);
+    background: rgba(242, 180, 92, 0.1);
+    color: var(--amber);
+    font-size: 13.5px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: rgba(242, 180, 92, 0.22);
+  }
+
+  .btn.primary {
+    flex: 1;
+    background: var(--amber);
+    color: #0d1117;
+    font-weight: 700;
+  }
+
+  .btn.primary:hover:not(:disabled) {
+    background: #f6c47a;
+  }
+
+  .btn.quiet {
+    border-color: rgba(233, 228, 216, 0.22);
+    background: transparent;
+    color: var(--ink-dim);
+  }
+
+  .btn:focus-visible {
+    box-shadow: 0 0 0 3px var(--cyan);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* ---------- 任务便签 ---------- */
+  .note-wrap {
+    position: relative;
+    padding-top: 16px;
+  }
+
+  .pin {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 64px;
+    height: 20px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: rgba(233, 228, 216, 0.28);
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  .sticky {
+    position: relative;
+    padding: 22px 18px 18px;
+    border-radius: 4px 4px 10px 10px;
+    color: var(--paper-ink);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 25px, rgba(43, 36, 27, 0.07) 25px 26px),
+      linear-gradient(170deg, #f7edd1 0%, var(--paper) 60%, #e0d2ad 100%);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+    rotate: 1.5deg;
+  }
+
+  .st-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--paper-dim);
+  }
+
+  .st-title {
+    margin-top: 4px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+
+  .st-limit {
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    border: 1px dashed rgba(43, 36, 27, 0.35);
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .st-limit b {
+    font-weight: 800;
+  }
+
+  .parts {
+    list-style: none;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .part {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 0 8px;
+    border-bottom: 1px dashed rgba(43, 36, 27, 0.2);
+  }
+
+  .part-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .part-state {
+    align-self: flex-start;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--paper-dim);
+    background: rgba(43, 36, 27, 0.06);
+  }
+
+  .part.on .part-state {
+    color: #6e430f;
+    background: rgba(242, 180, 92, 0.45);
+    font-weight: 700;
+  }
+
+  .part.off .part-name {
+    text-decoration: line-through;
+    text-decoration-color: rgba(43, 36, 27, 0.4);
+  }
+
+  .part.off .part-state {
+    color: #8a3d33;
+    background: rgba(231, 154, 143, 0.35);
+  }
+
+  .part.back .part-state {
+    color: var(--paper-ink);
+    background: rgba(43, 36, 27, 0.12);
+  }
+
+  .changed {
+    animation: mark 0.6s ease;
+  }
+
+  @keyframes mark {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .next {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(43, 36, 27, 0.08);
+  }
+
+  .next-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+  }
+
+  .next-text {
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
+  .next.done {
+    background: rgba(242, 180, 92, 0.4);
+  }
+
+  .next.ended {
+    background: rgba(43, 36, 27, 0.14);
+  }
+
+  /* ---------- 结尾 ---------- */
+  .finale {
+    width: min(760px, 100% - 32px);
+    margin: clamp(26px, 4vh, 40px) auto max(36px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 0.6s ease, translate 0.6s var(--ease);
+  }
+
+  .finale.show {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .feedback {
+    font-size: clamp(18px, 2.6vw, 22px);
+    font-weight: 800;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    outline: none;
+  }
+
+  .path {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
+  .setting {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-faint);
+  }
+
+  .lesson {
+    width: 100%;
+    padding: 20px 14px;
+    border-top: 1px solid rgba(242, 180, 92, 0.3);
+    border-bottom: 1px solid rgba(242, 180, 92, 0.3);
+    font-size: clamp(18px, 3.4vw, 26px);
+    font-weight: 800;
+    line-height: 1.55;
+    letter-spacing: 0.06em;
+    color: var(--amber);
+  }
+
+  .lesson-tag {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+  }
+
+  .notes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(14, 18, 25, 0.62);
+    border: 1px solid var(--glass-line);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .note-tag {
+    align-self: flex-start;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #0d1117;
+    background: var(--amber);
+  }
+
+  .note.mine .note-tag {
+    background: var(--rose);
+  }
+
+  .note p {
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  .finale .btn.primary {
+    flex: none;
+    padding: 11px 22px;
+  }
+
+  /* ---------- 手机 ---------- */
+  @media (max-width: 760px) {
+    .kicker {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
+
+    .layout {
+      grid-template-columns: minmax(0, 420px);
+    }
+
+    .phone {
+      rotate: 0deg;
+    }
+
+    .sticky {
+      rotate: 0.6deg;
+    }
+
+    .notes {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lamp,
+    .msg,
+    .typing i,
+    .draft.flash,
+    .changed {
+      animation: none;
+    }
+
+    .log {
+      scroll-behavior: auto;
+    }
+
+    .finale,
+    .btn,
+    .opt {
+      transition: none;
+    }
+  }
+
+  /* 提高聊天、操作与依据文字的可读性 */
+  .phone, .sticky { rotate: 0deg; }
+  .msg, .draft { font-size: 16px; line-height: 1.75; }
+  .opt { font-size: 15px; line-height: 1.6; padding: 11px 12px; }
+  .hint { font-size: 15px; line-height: 1.75; max-width: 42em; margin-left: auto; margin-right: auto; }
+  .demo, .pre-status, .st-limit, .setting { font-size: 13px; line-height: 1.75; }
+  .who-status, .empty-log, .draft-label, .opt-label, .st-tag, .part-state, .next-label, .lesson-tag { font-size: 12px; line-height: 1.6; }
+  .msg.system { font-size: 13px; line-height: 1.7; border-radius: 12px; }
+  .part-name, .next-text, .btn, .path, .note p { font-size: 15px; line-height: 1.7; }
+  .note-tag { font-size: 12px; line-height: 1.5; }
+</style>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body data-page="choice">
+
+<header class="top">
+  <a class="back" id="back" href="index.html"><span aria-hidden="true">←</span><span id="backText"></span></a>
+  <span class="kicker" id="kicker"></span>
+</header>
+
+<section class="intro">
+  <p class="demo" id="demoNote"></p>
+  <h1 id="title"></h1>
+  <p class="lead" id="lead"></p>
+  <p class="hint" id="hint" aria-live="polite"></p>
+</section>
+
+<main class="scene">
+  <div class="desk" aria-hidden="true"><div class="lamp"></div></div>
+
+  <div class="layout">
+    <section class="phone" aria-label="手机聊天">
+      <div class="screen">
+        <div class="notch" aria-hidden="true"></div>
+
+        <div class="chat-head">
+          <span class="avatar" id="avatar" aria-hidden="true"></span>
+          <span class="who">
+            <span class="who-name"><span id="contactName"></span><small id="contactTag"></small></span>
+            <span class="who-status" id="contactStatus"></span>
+          </span>
+        </div>
+
+        <p class="pre-status" id="preStatus"></p>
+
+        <div class="log" id="log" role="log" aria-live="polite" aria-label="聊天记录"></div>
+
+        <div class="offer" id="offer" hidden>
+          <button type="button" class="btn primary" id="continueBtn"></button>
+          <button type="button" class="btn quiet" id="declineBtn"></button>
+        </div>
+
+        <div class="composer" id="composer">
+          <div class="draft-label">
+            <span id="draftLabel"></span>
+            <span class="draft-meta" id="draftMeta"></span>
+          </div>
+          <p class="draft" id="draft"></p>
+          <span class="opt-label" id="optLabel"></span>
+          <div class="opts" id="opts" role="group"></div>
+          <div class="row">
+            <button type="button" class="btn primary" id="sendBtn"></button>
+            <button type="button" class="btn quiet" id="exitBtn"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="note-wrap" aria-label="任务便签">
+      <span class="pin" aria-hidden="true"></span>
+      <div class="sticky">
+        <p class="st-tag" id="stTag"></p>
+        <p class="st-title" id="stTitle"></p>
+        <p class="st-limit" id="stLimit"></p>
+        <ul class="parts" id="parts"></ul>
+        <div class="next" id="next">
+          <p class="next-label" id="nextLabel"></p>
+          <p class="next-text" id="nextText"></p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<section class="finale" id="finale" hidden aria-label="这次的结果">
+  <h2 class="feedback" id="feedback" tabindex="-1"></h2>
+  <p class="path" id="path"></p>
+  <p class="setting" id="setting"></p>
+  <p class="lesson"><span id="lesson"></span><span class="lesson-tag" id="lessonTag"></span></p>
+  <div class="notes" id="notes"></div>
+  <button type="button" class="btn primary" id="retryBtn"></button>
+</section>
+
+<script>
+/* ==================================================
+   配置区：文案、做法与固定回应设定集中在这里
+   ================================================== */
+var CONFIG = {
+  backHref: "index.html",
+  backText: "返回首页",
+  kicker: "《金钱心理学》× 小组展示",
+  demoNote: "合作情境演示：任务、话术与回复均为虚构。",
+  title: "你想怎么做？",
+  lead: "你想请同学一起完成小组展示，你会怎么开口？",
+
+  contact: {
+    name: "小组同学",
+    tag: "演示",
+    avatar: "同",
+    status: "这周比较忙"
+  },
+
+  preStatus: "同学这周很忙，最多接一项。具体能做什么，还需要问。",
+
+  options: [
+    { id: "case", label: "找一个能用的案例", ask: "找案例" },
+    { id: "review", label: "检查演示稿是否讲得清楚", ask: "帮忙检查演示稿" },
+    { id: "diagram", label: "为一张关键页面画示意图", ask: "为关键页面画示意图" }
+  ],
+
+  invite: {
+    vague: "你要不要和我一起准备这次展示？",
+    open: "这次展示，你愿意",
+    single: "吗？",
+    join: "、",
+    or: "，还是",
+    end: "？",
+    tail: "也可以告诉我你想怎么参与；这周不方便也没关系。"
+  },
+
+  /* 固定演示设定：不随机 */
+  partner: {
+    canDo: "review",
+    typingDelay: 450,
+    replyDelay: 1400
+  },
+
+  replies: {
+    vague: "这周有点忙，你具体需要我帮什么？",
+    accept: "检查稿子我可以。你把稿子发来，我先看看哪里讲不清楚。",
+    counter: "这几项我这周做不了。如果需要检查演示稿，我可以帮这一项。"
+  },
+
+  followUp: {
+    continueBtn: "按这个方式继续",
+    declineBtn: "这次先不合作",
+    continueMsg: "好，就按这个方式。我准备一版稿子发你。",
+    declineMsg: "谢谢你，这次我先自己另作安排。"
+  },
+
+  system: {
+    vagueTag: "请求还不够具体",
+    matchNote: "演示设定：双方限制正好匹配。现实中给出选项，不代表一定成功。",
+    confirmed: "已确认下一步",
+    ended: "这次没有继续合作",
+    notSent: "这次没有发出邀请",
+    stopped: "你结束了这次邀请"
+  },
+
+  composer: {
+    draftLabel: "邀请预览",
+    metaNone: "目前只问：做不做",
+    metaSome: "加入了 {n} 种做法",
+    optLabel: "加入具体做法 · 再点一次可撤回",
+    send: "发送",
+    exit: "这次先不发／另作安排",
+    exitAfter: "另作安排"
+  },
+
+  note: {
+    tag: "任务便签",
+    title: "课程展示",
+    limit: "<b>同学的情况：</b>这周较忙，最多承担一项小任务，也可以不参与。",
+    nextLabel: "下一步",
+    states: {
+      pending: "待安排",
+      invite: "拟邀请同学",
+      asked: "已询问",
+      canHelp: "同学可以帮这一项",
+      cannot: "同学这周做不了",
+      partner: "交给同学检查",
+      mine: "仍需安排",
+      back: "回到自己手里"
+    },
+    next: {
+      start: "先问问同学能做什么。",
+      vague: "同学想知道具体要帮什么。",
+      waiting: "等待同学回复。",
+      offer: "同学提出可以检查演示稿，等你决定。",
+      agreed: "准备一版稿子，交给同学检查。",
+      ended: "任务仍需另作安排。"
+    }
+  },
+
+  hints: {
+    start: "点选想请同学帮忙的做法，看看邀请怎样变化，再发送。也可以直接发送原来的邀请。",
+    vague: "同学问你具体要帮什么。补上做法再发，或另作安排。",
+    waiting: "已发送，等待回复……",
+    offer: "同学提出了自己能做的方式，由你决定。",
+    done: "这一轮结束了，可以重新试一次比较。",
+    reset: "回到开头：同一位同学，同样的限制。"
+  },
+
+  feedback: {
+    agreed: "你们确认了一种双方能接受的做法。",
+    ended: "这次没有继续合作，任务还需要另作安排。",
+    paths: {
+      direct: "你提出的做法里，正好有同学本轮能承担的一项。",
+      counter: "同学提出了自己能做的方式，你选择按这个方式继续。",
+      declined: "同学提出了自己能做的方式，你选择这次先不合作。",
+      exitBefore: "你选择这次先不发，另作安排。",
+      exitAfter: "你结束了这次邀请，另作安排。"
+    },
+    setting: "本轮演示设定：同学最多接一项；能帮忙检查演示稿，没有余力找案例或画图。"
+  },
+
+  lesson: "提供选项，也要容得下对方提出别的做法，或者不参与。",
+  lessonTag: "作品提示",
+
+  sources: [
+    {
+      kind: "book",
+      tag: "书中观点 · 内容概括",
+      text: "《金钱心理学》讨论了自主权：人希望参与决定自己的行动，被别人替自己做选择时，可能拒绝原本愿意配合的事。"
+    },
+    {
+      kind: "mine",
+      tag: "我的理解 · 内容概括",
+      text: "请人一起做事时，我想到把“做不做”展开成具体做法，给对方参与选择的余地。"
+    }
+  ],
+
+  retry: "重新试一次"
+};
+/* ================== 配置区结束 ================== */
+
+(function () {
+  var C = CONFIG;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function fmt(s, d) {
+    return String(s).replace(/\{(\w+)\}/g, function (m, k) {
+      return d && d[k] !== undefined ? d[k] : m;
+    });
+  }
+
+  /* ---------- 静态文字 ---------- */
+  $("back").href = C.backHref;
+  $("backText").textContent = C.backText;
+  $("kicker").textContent = C.kicker;
+  $("demoNote").textContent = C.demoNote;
+  $("title").textContent = C.title;
+  $("lead").textContent = C.lead;
+  $("avatar").textContent = C.contact.avatar;
+  $("contactName").textContent = C.contact.name;
+  $("contactTag").textContent = C.contact.tag;
+  $("contactStatus").textContent = C.contact.status;
+  $("preStatus").textContent = C.preStatus;
+  $("draftLabel").textContent = C.composer.draftLabel;
+  $("optLabel").textContent = C.composer.optLabel;
+  $("sendBtn").textContent = C.composer.send;
+  $("continueBtn").textContent = C.followUp.continueBtn;
+  $("declineBtn").textContent = C.followUp.declineBtn;
+  $("stTag").textContent = C.note.tag;
+  $("stTitle").textContent = C.note.title;
+  $("stLimit").innerHTML = C.note.limit;
+  $("nextLabel").textContent = C.note.nextLabel;
+  $("lesson").textContent = C.lesson;
+  $("lessonTag").textContent = C.lessonTag;
+  $("setting").textContent = C.feedback.setting;
+  $("retryBtn").textContent = C.retry;
+  $("opts").setAttribute("aria-label", C.composer.optLabel);
+
+  C.sources.forEach(function (s) {
+    var box = document.createElement("article");
+    box.className = "note" + (s.kind === "mine" ? " mine" : "");
+    var tag = document.createElement("span");
+    tag.className = "note-tag";
+    tag.textContent = s.tag;
+    var p = document.createElement("p");
+    p.textContent = s.text;
+    box.appendChild(tag);
+    box.appendChild(p);
+    $("notes").appendChild(box);
+  });
+
+  /* ---------- 做法按钮与便签行 ---------- */
+  var optEls = {};
+  var partEls = {};
+
+  C.options.forEach(function (o) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.setAttribute("aria-pressed", "false");
+    b.innerHTML = '<span class="mk" aria-hidden="true"></span><span class="opt-text"></span>';
+    b.querySelector(".opt-text").textContent = o.label;
+    b.addEventListener("click", function () {
+      toggle(o.id);
+    });
+    $("opts").appendChild(b);
+    optEls[o.id] = b;
+
+    var li = document.createElement("li");
+    li.className = "part";
+    li.innerHTML = '<span class="part-name"></span><span class="part-state"></span>';
+    li.querySelector(".part-name").textContent = o.label;
+    $("parts").appendChild(li);
+    partEls[o.id] = li;
+  });
+
+  /* ---------- 状态 ---------- */
+  var state;
+  var epoch = 0;
+  var timers = [];
+  var lastPart = {};
+  var lastNext = "";
+  var lastDraft = "";
+
+  function fresh() {
+    return {
+      phase: "compose",
+      selected: {},
+      lastAsked: [],
+      sent: 0,
+      vagueReplied: false,
+      outcome: null,
+      path: null
+    };
+  }
+
+  function selectedIds() {
+    return C.options
+      .filter(function (o) {
+        return state.selected[o.id];
+      })
+      .map(function (o) {
+        return o.id;
+      });
+  }
+
+  function optById(id) {
+    for (var i = 0; i < C.options.length; i++) {
+      if (C.options[i].id === id) return C.options[i];
+    }
+    return null;
+  }
+
+  function buildInvite(ids) {
+    var I = C.invite;
+    if (!ids.length) return I.vague;
+    var asks = ids.map(function (id) {
+      return optById(id).ask;
+    });
+    var body;
+    if (asks.length === 1) {
+      body = I.open + asks[0] + I.single;
+    } else {
+      body = I.open + asks.slice(0, -1).join(I.join) + I.or + asks[asks.length - 1] + I.end;
+    }
+    return body + I.tail;
+  }
+
+  /* ---------- 定时器：重试或退出后作废旧回复 ---------- */
+  function schedule(fn, ms) {
+    var my = epoch;
+    var t = setTimeout(function () {
+      if (my !== epoch) return;
+      fn();
+    }, reduce ? Math.min(ms, 300) : ms);
+    timers.push(t);
+  }
+
+  function cancelPending() {
+    epoch++;
+    timers.forEach(clearTimeout);
+    timers = [];
+    hideTyping();
+  }
+
+  /* ---------- 聊天 ---------- */
+  var log = $("log");
+  var typingEl = null;
+
+  function clearEmpty() {
+    var e = log.querySelector(".empty-log");
+    if (e) e.remove();
+  }
+
+  function scrollLog() {
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function appendMsg(kind, text, extra) {
+    clearEmpty();
+    var m = document.createElement("p");
+    m.className = "msg " + kind + (extra ? " " + extra : "");
+    m.textContent = text;
+    if (typingEl) {
+      log.insertBefore(m, typingEl);
+    } else {
+      log.appendChild(m);
+    }
+    scrollLog();
+  }
+
+  function showTyping() {
+    if (typingEl) return;
+    typingEl = document.createElement("span");
+    typingEl.className = "typing";
+    typingEl.setAttribute("aria-hidden", "true");
+    typingEl.innerHTML = "<i></i><i></i><i></i>";
+    log.appendChild(typingEl);
+    scrollLog();
+  }
+
+  function hideTyping() {
+    if (typingEl) {
+      typingEl.remove();
+      typingEl = null;
+    }
+  }
+
+  function resetLog() {
+    log.textContent = "";
+    typingEl = null;
+    var e = document.createElement("span");
+    e.className = "empty-log";
+    e.textContent = "还没有消息";
+    log.appendChild(e);
+  }
+
+  /* ---------- 便签 ---------- */
+  function partInfo(id) {
+    var S = C.note.states;
+    var can = C.partner.canDo;
+    var asked = state.lastAsked.indexOf(id) >= 0;
+    if (state.outcome === "agreed") {
+      return id === can ? { t: S.partner, c: "on" } : { t: S.mine, c: "" };
+    }
+    if (state.outcome === "declined" || state.outcome === "exit") {
+      return { t: S.back, c: "back" };
+    }
+    if (state.phase === "offer") {
+      if (id === can) return { t: S.canHelp, c: "on" };
+      return asked ? { t: S.cannot, c: "off" } : { t: S.pending, c: "" };
+    }
+    if (state.phase === "waiting") {
+      return asked ? { t: S.asked, c: "on" } : { t: S.pending, c: "" };
+    }
+    return state.selected[id] ? { t: S.invite, c: "on" } : { t: S.pending, c: "" };
+  }
+
+  function nextInfo() {
+    var N = C.note.next;
+    if (state.outcome === "agreed") return { t: N.agreed, c: "done" };
+    if (state.outcome) return { t: N.ended, c: "ended" };
+    if (state.phase === "waiting") return { t: N.waiting, c: "" };
+    if (state.phase === "offer") return { t: N.offer, c: "" };
+    if (state.vagueReplied) return { t: N.vague, c: "" };
+    return { t: N.start, c: "" };
+  }
+
+  function pulse(el) {
+    if (reduce) return;
+    el.classList.remove("changed");
+    void el.offsetWidth;
+    el.classList.add("changed");
+  }
+
+  /* ---------- 渲染 ---------- */
+  function render() {
+    var p = state.phase;
+    var ids = selectedIds();
+    var composing = p === "compose";
+
+    $("preStatus").hidden = state.sent > 0;
+
+    /* 输入区 */
+    $("composer").hidden = p === "done" || p === "offer";
+    var draft = buildInvite(ids);
+    var d = $("draft");
+    d.textContent = draft;
+    if (draft !== lastDraft && lastDraft !== "" && !reduce) {
+      d.classList.remove("flash");
+      void d.offsetWidth;
+      d.classList.add("flash");
+    }
+    lastDraft = draft;
+    $("draftMeta").textContent = ids.length
+      ? fmt(C.composer.metaSome, { n: ids.length })
+      : C.composer.metaNone;
+
+    C.options.forEach(function (o) {
+      var b = optEls[o.id];
+      var on = !!state.selected[o.id];
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.querySelector(".mk").textContent = on ? "✓" : "+";
+      b.disabled = !composing;
+    });
+
+    $("sendBtn").disabled = !composing;
+    $("exitBtn").textContent = state.sent > 0 ? C.composer.exitAfter : C.composer.exit;
+
+    /* 对方提出方式后的选择 */
+    $("offer").hidden = p !== "offer";
+
+    /* 便签 */
+    C.options.forEach(function (o) {
+      var li = partEls[o.id];
+      var info = partInfo(o.id);
+      li.className = "part" + (info.c ? " " + info.c : "");
+      var st = li.querySelector(".part-state");
+      st.textContent = info.t;
+      if (lastPart[o.id] !== undefined && lastPart[o.id] !== info.t) pulse(st);
+      lastPart[o.id] = info.t;
+    });
+    var nx = nextInfo();
+    var nextEl = $("next");
+    nextEl.className = "next" + (nx.c ? " " + nx.c : "");
+    $("nextText").textContent = nx.t;
+    if (lastNext && lastNext !== nx.t) pulse(nextEl);
+    lastNext = nx.t;
+
+    /* 结尾 */
+    var finale = $("finale");
+    if (p === "done") {
+      var F = C.feedback;
+      $("feedback").textContent = state.outcome === "agreed" ? F.agreed : F.ended;
+      $("path").textContent = F.paths[state.path] || "";
+      if (finale.hidden) {
+        finale.hidden = false;
+        finale.classList.remove("show");
+        if (reduce) {
+          finale.classList.add("show");
+        } else {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              finale.classList.add("show");
+            });
+          });
+        }
+      }
+    } else {
+      finale.classList.remove("show");
+      finale.hidden = true;
+    }
+  }
+
+  function say(msg) {
+    $("hint").textContent = msg;
+  }
+
+  function focusFinale() {
+    setTimeout(function () {
+      $("feedback").focus({ preventScroll: true });
+      $("finale").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+    }, reduce ? 0 : 250);
+  }
+
+  /* ---------- 操作 ---------- */
+  function toggle(id) {
+    if (state.phase !== "compose") return;
+    state.selected[id] = !state.selected[id];
+    render();
+  }
+
+  function send() {
+    if (state.phase !== "compose") return;
+    var ids = selectedIds();
+    appendMsg("me", buildInvite(ids));
+    state.lastAsked = ids;
+    state.sent++;
+    state.phase = "waiting";
+    render();
+    say(C.hints.waiting);
+    $("exitBtn").focus({ preventScroll: true });
+
+    schedule(showTyping, C.partner.typingDelay);
+    schedule(reply, C.partner.replyDelay);
+  }
+
+  function reply() {
+    hideTyping();
+    var asked = state.lastAsked;
+    var R = C.replies;
+
+    if (!asked.length) {
+      appendMsg("them", R.vague);
+      appendMsg("system", C.system.vagueTag, "mark");
+      state.phase = "compose";
+      state.vagueReplied = true;
+      state.selected = {};
+      render();
+      say(C.hints.vague);
+      optEls[C.options[0].id].focus({ preventScroll: true });
+      return;
+    }
+
+    if (asked.indexOf(C.partner.canDo) >= 0) {
+      appendMsg("them", R.accept);
+      appendMsg("system", C.system.matchNote);
+      state.phase = "done";
+      state.outcome = "agreed";
+      state.path = "direct";
+      render();
+      say(C.hints.done);
+      focusFinale();
+      return;
+    }
+
+    appendMsg("them", R.counter);
+    state.phase = "offer";
+    render();
+    say(C.hints.offer);
+    $("continueBtn").focus({ preventScroll: true });
+  }
+
+  function acceptCounter() {
+    if (state.phase !== "offer") return;
+    appendMsg("me", C.followUp.continueMsg);
+    appendMsg("system", C.system.confirmed, "mark");
+    state.phase = "done";
+    state.outcome = "agreed";
+    state.path = "counter";
+    render();
+    say(C.hints.done);
+    focusFinale();
+  }
+
+  function declineCounter() {
+    if (state.phase !== "offer") return;
+    appendMsg("me", C.followUp.declineMsg);
+    appendMsg("system", C.system.ended);
+    state.phase = "done";
+    state.outcome = "declined";
+    state.path = "declined";
+    render();
+    say(C.hints.done);
+    focusFinale();
+  }
+
+  function exitInvite() {
+    if (state.phase !== "compose" && state.phase !== "waiting") return;
+    cancelPending();
+    appendMsg("system", state.sent > 0 ? C.system.stopped : C.system.notSent);
+    state.path = state.sent > 0 ? "exitAfter" : "exitBefore";
+    state.phase = "done";
+    state.outcome = "exit";
+    render();
+    say(C.hints.done);
+    focusFinale();
+  }
+
+  function retry() {
+    cancelPending();
+    state = fresh();
+    lastPart = {};
+    lastNext = "";
+    lastDraft = "";
+    resetLog();
+    render();
+    say(C.hints.reset);
+    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    optEls[C.options[0].id].focus({ preventScroll: true });
+  }
+
+  $("sendBtn").addEventListener("click", send);
+  $("exitBtn").addEventListener("click", exitInvite);
+  $("continueBtn").addEventListener("click", acceptCounter);
+  $("declineBtn").addEventListener("click", declineCounter);
+  $("retryBtn").addEventListener("click", retry);
+
+  state = fresh();
+  resetLog();
+  render();
+  say(C.hints.start);
+})();
+</script>
+</body>
+</html>
