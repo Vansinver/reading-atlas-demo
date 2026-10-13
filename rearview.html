@@ -1,20 +1,23 @@
-<!-- File: rearview.html -->
 <!DOCTYPE html>
-<html lang="zh-CN" class="rearview-page">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex">
 <title>后视镜｜《金钱心理学》× 旧课程笔记</title>
 <style>
   :root {
     --ink: #e9e4d8;
-    --ink-dim: #a39d90;
+    --ink-dim: #c5beaf;
     --amber: #f2b45c;
     --cyan: #8fd3e8;
     --rose: #e79a8f;
-    --glass: rgba(20, 26, 34, 0.92);
-    --mirror-w: 280px;
-    --mirror-h: 124px;
+    --panel: #0c0f14;
+    --line: rgba(255, 255, 255, 0.14);
+    --glass: rgba(20, 26, 34, 0.96);
+    --mirror-w: min(100%, 360px);
+    --mirror-h: 168px;
   }
 
   * {
@@ -23,31 +26,43 @@
     padding: 0;
   }
 
-  html,
+  [hidden] {
+    display: none !important;
+  }
+
+  html {
+    background: #05070b;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    height: 100%;
+    min-height: 100vh;
+    min-height: 100svh;
     background: #05070b;
     color: var(--ink);
     font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
-    overflow: hidden;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .stage {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  /* ---------- 夜路 ---------- */
-  .road {
+  .sr-only {
     position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---------- 夜路（固定背景） ---------- */
+  .road {
+    position: fixed;
     inset: 0;
-    will-change: filter;
+    z-index: 0;
+    pointer-events: none;
   }
 
   .road svg {
@@ -58,7 +73,6 @@
 
   .dash {
     stroke-dasharray: 26 34;
-    animation: drive 1.4s linear infinite;
   }
 
   @keyframes drive {
@@ -68,52 +82,71 @@
   }
 
   .fog {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    background:
-      radial-gradient(ellipse at 50% 55%, rgba(60, 70, 85, 0.0) 0%, rgba(10, 12, 18, 0.85) 70%),
-      linear-gradient(to bottom, rgba(8, 10, 14, 0.6), rgba(8, 10, 14, 0.9));
+    z-index: 0;
     opacity: 0;
     pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 55%, rgba(60, 70, 85, 0) 0%, rgba(10, 12, 18, 0.85) 70%),
+      linear-gradient(to bottom, rgba(8, 10, 14, 0.6), rgba(8, 10, 14, 0.9));
   }
 
   .vignette {
-    position: absolute;
+    position: fixed;
     inset: 0;
+    z-index: 0;
     pointer-events: none;
     background: radial-gradient(ellipse at 50% 60%, transparent 45%, rgba(0, 0, 0, 0.75) 100%);
   }
 
-  .road-label {
-    position: absolute;
-    left: 50%;
-    top: 58%;
-    transform: translateX(-50%);
-    font-size: 12px;
-    letter-spacing: 0.4em;
-    color: rgba(233, 228, 216, 0.55);
-    pointer-events: none;
+  /* ---------- 页面骨架 ---------- */
+  .page {
+    position: relative;
+    z-index: 1;
+    width: min(680px, 100%);
+    margin: 0 auto;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(36px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
-  /* ---------- 标题 ---------- */
-  .title {
-    position: absolute;
-    top: max(18px, env(safe-area-inset-top));
-    left: 0;
-    right: 0;
-    text-align: center;
-    padding: 0 16px;
-    pointer-events: none;
-    z-index: 3;
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 10px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
+    margin-left: -12px;
+    color: var(--amber);
+    font-size: 15px;
+    text-decoration: none;
+    touch-action: manipulation;
+  }
+
+  .back:hover {
+    text-decoration: underline;
   }
 
   .kicker {
-    display: inline-block;
-    font-size: clamp(15px, 3.6vw, 20px);
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    padding: 6px 14px;
-    border: 1px solid rgba(242, 180, 92, 0.55);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    padding: 4px 12px;
+    border: 1px solid rgba(242, 180, 92, 0.6);
     border-radius: 999px;
     color: var(--amber);
     background: rgba(242, 180, 92, 0.08);
@@ -125,32 +158,85 @@
     font-weight: 400;
   }
 
-  .title h1 {
-    margin-top: 10px;
-    font-size: clamp(22px, 5.4vw, 34px);
-    font-weight: 700;
-    letter-spacing: 0.08em;
+  a:focus-visible,
+  .btn:focus-visible {
+    outline: 3px solid var(--cyan);
+    outline-offset: 3px;
   }
 
-  .title h1 span {
-    display: block;
-    margin-top: 4px;
-    font-size: clamp(13px, 3.2vw, 16px);
-    font-weight: 400;
-    letter-spacing: 0.04em;
-    color: var(--ink-dim);
+  /* ---------- 标签 ---------- */
+  .tag {
+    display: inline-block;
+    font-size: 13px;
+    line-height: 1.3;
+    letter-spacing: 0.08em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    color: #0d1117;
+  }
+
+  .tag-note { background: var(--cyan); }
+  .tag-book { background: var(--amber); }
+  .tag-mine { background: var(--rose); }
+  .tag-front { background: var(--ink); }
+
+  .tag-demo {
+    background: transparent;
+    color: var(--amber);
+    border: 1px solid rgba(242, 180, 92, 0.75);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* ---------- 开场 ---------- */
+  .intro {
+    display: grid;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: rgba(12, 15, 20, 0.92);
+    border: 1px solid var(--line);
+  }
+
+  .intro-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .intro h1 {
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: 0.1em;
+  }
+
+  .intro p {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .intro .task strong {
+    color: var(--amber);
   }
 
   /* ---------- 后视镜 ---------- */
+  .rear {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+  }
+
   .mount {
-    position: absolute;
-    left: 50%;
-    top: 0;
+    position: relative;
     width: var(--mirror-w);
-    height: var(--mirror-h);
-    margin-left: calc(var(--mirror-w) / -2);
+    margin-top: 28px;
     perspective: 900px;
-    z-index: 4;
   }
 
   .stem {
@@ -164,30 +250,45 @@
     border-radius: 3px;
   }
 
-  .mirror {
+  .sr-slider {
     position: absolute;
     inset: 0;
-    border-radius: 22px;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mirror {
+    position: relative;
+    display: flex;
+    min-height: var(--mirror-h);
     padding: 7px;
+    border-radius: 22px;
     background: linear-gradient(160deg, #3a3f48, #14171c 60%, #22262d);
     box-shadow:
       0 14px 40px rgba(0, 0, 0, 0.6),
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
     transform-origin: 50% 0%;
     cursor: grab;
-    touch-action: none;
-    outline: none;
-    will-change: transform;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .mirror:active {
     cursor: grabbing;
   }
 
-  .mirror:focus-visible {
-    box-shadow:
-      0 0 0 3px rgba(143, 211, 232, 0.7),
-      0 14px 40px rgba(0, 0, 0, 0.6);
+  .mirror.locked {
+    cursor: default;
+  }
+
+  .mount.is-focus .mirror {
+    outline: 3px solid var(--cyan);
+    outline-offset: 4px;
   }
 
   .mirror.invite::after {
@@ -195,26 +296,27 @@
     position: absolute;
     inset: -6px;
     border-radius: 28px;
-    border: 1px solid rgba(242, 180, 92, 0.6);
-    animation: halo 2.2s ease-in-out infinite;
+    border: 1px solid rgba(242, 180, 92, 0.75);
     pointer-events: none;
   }
 
   @keyframes halo {
     0%, 100% {
-      opacity: 0.15;
+      opacity: 0.25;
       transform: scale(1);
     }
     50% {
-      opacity: 0.85;
-      transform: scale(1.04);
+      opacity: 0.9;
+      transform: scale(1.03);
     }
   }
 
   .glass {
     position: relative;
-    width: 100%;
-    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     border-radius: 16px;
     overflow: hidden;
     background: var(--glass);
@@ -223,7 +325,7 @@
   .reflection {
     position: absolute;
     inset: 0;
-    opacity: 0.55;
+    opacity: 0.5;
   }
 
   .reflection svg {
@@ -233,64 +335,48 @@
   }
 
   .note {
-    position: absolute;
-    inset: 0;
-    padding: 10px 14px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: 6px;
-    will-change: filter, opacity;
+    padding: 12px 16px;
   }
 
-  .tag {
-    display: inline-block;
+  .note .tag {
     align-self: flex-start;
-    font-size: 10px;
-    line-height: 1;
-    letter-spacing: 0.12em;
-    padding: 4px 7px;
-    border-radius: 4px;
-    font-weight: 700;
-  }
-
-  .tag.note-tag {
-    color: #0d1117;
-    background: var(--cyan);
-  }
-
-  .tag.judge-tag {
-    color: #0d1117;
-    background: var(--rose);
-  }
-
-  .tag.book-tag {
-    color: #0d1117;
-    background: var(--amber);
   }
 
   .note .line1 {
-    font-size: 16px;
+    font-size: clamp(19px, 5.6vw, 24px);
     font-weight: 700;
+    line-height: 1.35;
     letter-spacing: 0.04em;
   }
 
   .note .line2 {
-    font-size: 10.5px;
+    font-size: 14px;
+    line-height: 1.5;
     color: var(--ink-dim);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
   }
 
   .chips span {
-    font-size: 10px;
-    padding: 2px 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 3px 10px;
     border-radius: 999px;
-    border: 1px solid rgba(143, 211, 232, 0.5);
+    border: 1px solid rgba(143, 211, 232, 0.6);
     color: var(--cyan);
   }
 
@@ -301,368 +387,799 @@
     pointer-events: none;
   }
 
-  /* ---------- 底部区域 ---------- */
-  .dock {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: max(16px, env(safe-area-inset-bottom));
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 0 16px;
-    z-index: 5;
-    pointer-events: none;
+  /* ---------- 动作区 ---------- */
+
+  .slot {
+    width: min(100%, 440px);
+    min-height: 78px;
+    text-align: center;
   }
 
-  .card {
-    width: min(560px, 100%);
-    padding: 12px 14px;
-    border-radius: 12px;
-    background: rgba(12, 15, 20, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
-  }
-
-  .card p {
-    font-size: clamp(13px, 3.4vw, 15px);
-    line-height: 1.6;
-  }
-
-  .card small {
-    font-size: 11px;
-    color: var(--ink-dim);
-  }
-
-  .card.show {
-    opacity: 1;
-    transform: none;
-  }
-
-  .controls {
-    width: min(560px, 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .slot > [data-for] {
+    display: none;
     gap: 8px;
   }
 
-  .meter {
-    width: 100%;
+  .slot[data-state="hint"] > [data-for="hint"],
+  .slot[data-state="ready"] > [data-for="ready"],
+  .slot[data-state="done"] > [data-for="done"] {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--ink-dim);
-  }
-
-  .bar {
-    position: relative;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(242, 180, 92, 0.75);
-    overflow: hidden;
-  }
-
-  .bar i {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 0%;
-    background: var(--cyan);
   }
 
   .hint {
-    font-size: clamp(14px, 3.6vw, 16px);
-    letter-spacing: 0.1em;
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.02em;
     color: var(--ink);
-    min-height: 1.4em;
-    transition: opacity 0.3s;
   }
 
-  .return-link { pointer-events: auto; color: var(--amber); font-size: 12px; padding: 6px 12px; }
-  .return-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+  .arrow {
+    display: inline-block;
+    margin-left: 0.4em;
+    color: var(--amber);
+    font-weight: 700;
+  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .dash,
-    .mirror.invite::after {
-      animation: none;
+  @keyframes nudge {
+    0%, 100% {
+      transform: translateX(0);
     }
-    .card {
-      transition: none;
+    50% {
+      transform: translateX(6px);
+    }
+  }
+
+  .steps,
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid var(--amber);
+    background: transparent;
+    color: var(--amber);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+    cursor: pointer;
+    touch-action: manipulation;
+    text-decoration: none;
+  }
+
+  .btn.primary {
+    min-height: 48px;
+    background: var(--amber);
+    color: #0d1117;
+    font-size: 16px;
+  }
+
+  .btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  /* ---------- 前方：眼前要做的事 ---------- */
+  .front {
+    display: grid;
+    gap: 8px;
+  }
+
+  .front-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+
+  .front-sub {
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+
+  .front-list {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+
+  .sign {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: var(--panel);
+    border: 1px solid rgba(242, 180, 92, 0.5);
+  }
+
+  .sign-k {
+    flex: none;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  .sign-v {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .fine {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
+  /* ---------- 回正之后 ---------- */
+  .after {
+    display: grid;
+    gap: 14px;
+    padding-top: 6px;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .after h2 {
+    font-size: 22px;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+  }
+
+  .after:focus,
+  .after h2:focus {
+    outline: none;
+  }
+
+  .lead {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
+  .panel {
+    display: grid;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left-width: 4px;
+  }
+
+  .panel.p-note { border-left-color: var(--cyan); }
+  .panel.p-book { border-left-color: var(--amber); }
+  .panel.p-mine { border-left-color: var(--rose); }
+
+  .panel h3 {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .panel p {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .panel .quote {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .panel .meta {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-dim);
+  }
+
+  .routes {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+
+  .route {
+    display: grid;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #10151c;
+    border: 1px solid rgba(143, 211, 232, 0.4);
+  }
+
+  .route strong {
+    justify-self: start;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(143, 211, 232, 0.6);
+    color: var(--cyan);
+  }
+
+  .end-actions {
+    display: grid;
+    gap: 8px;
+    justify-items: start;
+  }
+
+  /* ---------- 较矮的手机竖屏：优先让镜子与前方要求靠近 ---------- */
+  @media (max-width: 480px) and (max-height: 740px) {
+    :root { --mirror-h: 140px; }
+
+    .page { gap: 8px; }
+    .back { font-size: 14px; }
+    .kicker { font-size: 12px; padding: 3px 8px; }
+
+    .intro { gap: 3px; padding: 8px 12px; }
+    .intro h1 { font-size: 22px; }
+    .intro p { font-size: 14px; line-height: 1.4; }
+    .intro .tag { font-size: 12px; }
+
+    .rear { gap: 5px; }
+    .mount { margin-top: 14px; }
+    .note { gap: 4px; padding: 8px 12px; }
+    .note .line1 { font-size: 19px; }
+    .note .line2 { font-size: 13px; }
+    .group, .chips { gap: 4px; }
+    .chips span { font-size: 13px; padding: 2px 7px; }
+
+    .slot { min-height: 72px; }
+    .slot > [data-for] { gap: 5px; }
+    .hint { font-size: 14px; line-height: 1.4; }
+
+    .front { gap: 4px; }
+    .front-list { gap: 4px; }
+    .sign { padding: 6px 10px; }
+    .sign-v { font-size: 15px; line-height: 1.4; }
+  }
+
+  /* ---------- 桌面略放大 ---------- */
+  @media (min-width: 761px) {
+    :root {
+      --mirror-w: min(100%, 440px);
+      --mirror-h: 200px;
+    }
+
+    .page {
+      padding-top: 20px;
+      gap: 18px;
+    }
+
+    .note .line1 {
+      font-size: 24px;
+    }
+  }
+
+  /* ---------- 动效：仅在允许动态时启用 ---------- */
+  @media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
+    .dash {
+      animation: drive 1.4s linear infinite;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mirror.invite::after {
+      animation: halo 2.2s ease-in-out infinite;
+    }
+
+    .arrow {
+      animation: nudge 1.4s ease-in-out infinite;
+    }
+
+    .after {
+      animation: rise 0.5s ease both;
     }
   }
 </style>
-<link rel="stylesheet" href="mobile.css">
+<noscript>
+  <style>
+    [hidden] { display: grid !important; }
+    .slot { display: none; }
+  </style>
+</noscript>
 </head>
-<body data-page="rearview">
-<main class="stage" id="stage">
+<body>
 
-  <div class="road" id="road" aria-hidden="true">
-    <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#05070d"/>
-          <stop offset="0.7" stop-color="#121a2a"/>
-          <stop offset="1" stop-color="#1d2536"/>
-        </linearGradient>
-        <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1a1d23"/>
-          <stop offset="1" stop-color="#2b2f36"/>
-        </linearGradient>
-        <radialGradient id="beam" cx="0.5" cy="1" r="0.75">
-          <stop offset="0" stop-color="#f6e2b0" stop-opacity="0.5"/>
-          <stop offset="0.6" stop-color="#f6e2b0" stop-opacity="0.08"/>
-          <stop offset="1" stop-color="#f6e2b0" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect width="1000" height="420" fill="url(#sky)"/>
-      <g fill="#cfd8e6">
-        <circle cx="120" cy="80" r="1.2" opacity="0.7"/>
-        <circle cx="260" cy="140" r="1" opacity="0.5"/>
-        <circle cx="410" cy="60" r="1.4" opacity="0.8"/>
-        <circle cx="620" cy="110" r="1" opacity="0.6"/>
-        <circle cx="760" cy="50" r="1.3" opacity="0.7"/>
-        <circle cx="880" cy="160" r="1" opacity="0.5"/>
-        <circle cx="540" cy="190" r="0.9" opacity="0.4"/>
-      </g>
-      <path d="M0 420 L140 395 L260 405 L380 388 L500 400 L640 386 L770 402 L900 392 L1000 404 L1000 420 Z" fill="#0b0e14"/>
-      <rect y="420" width="1000" height="280" fill="#0c0f14"/>
-      <polygon points="485,420 515,420 1000,700 0,700" fill="url(#asphalt)"/>
-      <polygon points="485,420 515,420 1000,700 0,700" fill="url(#beam)"/>
-      <line x1="487" y1="420" x2="40" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
-      <line x1="513" y1="420" x2="960" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
-      <line class="dash" x1="500" y1="420" x2="500" y2="700" stroke="#f2c46b" stroke-width="5"/>
-      <circle cx="500" cy="414" r="2.2" fill="#f7e3b5" opacity="0.9"/>
-    </svg>
+<div class="road" id="road" aria-hidden="true">
+  <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#05070d"/>
+        <stop offset="0.7" stop-color="#121a2a"/>
+        <stop offset="1" stop-color="#1d2536"/>
+      </linearGradient>
+      <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a1d23"/>
+        <stop offset="1" stop-color="#2b2f36"/>
+      </linearGradient>
+      <radialGradient id="beam" cx="0.5" cy="1" r="0.75">
+        <stop offset="0" stop-color="#f6e2b0" stop-opacity="0.5"/>
+        <stop offset="0.6" stop-color="#f6e2b0" stop-opacity="0.08"/>
+        <stop offset="1" stop-color="#f6e2b0" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1000" height="420" fill="url(#sky)"/>
+    <g fill="#cfd8e6">
+      <circle cx="120" cy="80" r="1.2" opacity="0.7"/>
+      <circle cx="260" cy="140" r="1" opacity="0.5"/>
+      <circle cx="410" cy="60" r="1.4" opacity="0.8"/>
+      <circle cx="620" cy="110" r="1" opacity="0.6"/>
+      <circle cx="760" cy="50" r="1.3" opacity="0.7"/>
+      <circle cx="880" cy="160" r="1" opacity="0.5"/>
+      <circle cx="540" cy="190" r="0.9" opacity="0.4"/>
+    </g>
+    <path d="M0 420 L140 395 L260 405 L380 388 L500 400 L640 386 L770 402 L900 392 L1000 404 L1000 420 Z" fill="#0b0e14"/>
+    <rect y="420" width="1000" height="280" fill="#0c0f14"/>
+    <polygon points="485,420 515,420 1000,700 0,700" fill="url(#asphalt)"/>
+    <polygon points="485,420 515,420 1000,700 0,700" fill="url(#beam)"/>
+    <line x1="487" y1="420" x2="40" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
+    <line x1="513" y1="420" x2="960" y2="700" stroke="#c9c4b8" stroke-width="3" opacity="0.55"/>
+    <line class="dash" x1="500" y1="420" x2="500" y2="700" stroke="#f2c46b" stroke-width="5"/>
+    <circle cx="500" cy="414" r="2.2" fill="#f7e3b5" opacity="0.9"/>
+  </svg>
+</div>
+<div class="fog" id="fog" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<main class="page" id="page">
+
+  <div class="top">
+    <a class="back" href="index.html">← 返回书的入口</a>
+    <span class="kicker">《金钱心理学》<span class="x">×</span>旧课程笔记</span>
   </div>
-  <div class="fog" id="fog"></div>
-  <div class="vignette"></div>
-  <div class="road-label" id="roadLabel">前 路</div>
 
-  <header class="title" id="title">
-    <div class="kicker">《金钱心理学》<span class="x">×</span>旧课程笔记</div>
-    <h1>后视镜<span>重看旧笔记，能看清多少前路？</span></h1>
-  </header>
+  <section class="intro" aria-labelledby="title">
+    <div class="intro-row">
+      <span class="tag tag-demo">互动演示 · 虚构情境</span>
+      <h1 id="title">后视镜</h1>
+    </div>
+    <p>设想一位大学生要为课程读书报告选书，周五前要交书目。</p>
+    <p class="task"><strong>你要做的：</strong>向右拖动下面的镜子，比较镜中的“旧笔记”和眼前要做的事。</p>
+  </section>
 
-  <div class="mount" id="mount">
-    <div class="stem"></div>
-    <div class="mirror invite" id="mirror" role="slider" tabindex="0"
-         aria-label="后视镜角度：越转向自己，旧笔记越清晰，前路越模糊"
-         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-      <div class="glass">
-        <div class="reflection" aria-hidden="true">
-          <svg viewBox="0 0 280 124" preserveAspectRatio="xMidYMid slice">
-            <rect width="280" height="124" fill="#0f141c"/>
-            <polygon points="130,40 150,40 280,124 0,124" fill="#1b1f26"/>
-            <line x1="140" y1="40" x2="140" y2="124" stroke="#6b5a35" stroke-width="2" stroke-dasharray="8 10"/>
-          </svg>
-        </div>
-        <div class="note" id="note">
-          <span class="tag note-tag">旧笔记 · 概括</span>
-          <div class="line1">准备到 60 分可以开始</div>
-          <div class="line2">记录过的选书途径：</div>
-          <div class="chips">
-            <span>论坛</span>
-            <span>电子书应用</span>
-            <span>书评</span>
-            <span>听书</span>
+  <section class="rear" aria-label="后视镜与操作提示">
+    <div class="mount" id="mount">
+      <div class="stem" aria-hidden="true"></div>
+      <input class="sr-slider" id="slider" type="range" min="0" max="100" step="5" value="0"
+             aria-label="后视镜角度（演示控件）：向右转，镜中的旧笔记更清楚，前方的要求更模糊">
+      <div class="mirror invite" id="mirror" role="group" aria-label="后视镜，可以向右拖动">
+        <div class="glass">
+          <div class="reflection" aria-hidden="true">
+            <svg viewBox="0 0 280 124" preserveAspectRatio="xMidYMid slice">
+              <rect width="280" height="124" fill="#0f141c"/>
+              <polygon points="130,40 150,40 280,124 0,124" fill="#1b1f26"/>
+              <line x1="140" y1="40" x2="140" y2="124" stroke="#6b5a35" stroke-width="2" stroke-dasharray="8 10"/>
+            </svg>
           </div>
+          <div class="note">
+            <div class="group" id="principleGroup">
+              <span class="tag tag-note">旧笔记 · 概括</span>
+              <div class="line1">准备到 60 分可以开始</div>
+            </div>
+            <div class="group" id="routesGroup">
+              <div class="line2">记录过的选书途径：</div>
+              <div class="chips">
+                <span>论坛</span>
+                <span>电子书应用</span>
+                <span>书评</span>
+                <span>听书</span>
+              </div>
+            </div>
+          </div>
+          <div class="glare"></div>
         </div>
-        <div class="glare"></div>
       </div>
     </div>
-  </div>
 
-  <div class="dock" id="dock">
-    <section class="card" id="judge" aria-live="polite">
-      <span class="tag judge-tag">我的判断 · 概括</span>
-      <p>重看旧笔记时，我认为：某些基本认知仍有用，但过去的具体内容需要谨慎判断。</p>
-    </section>
-    <section class="card" id="quote" aria-live="polite">
-      <span class="tag book-tag">书中观点</span>
-      <p>历史有助于校准预期，却不是未来的地图。</p>
-      <small>《金钱心理学》观点概括</small>
-    </section>
-    <div class="controls">
-      <div class="meter" aria-hidden="true">
-        <span>镜中</span>
-        <div class="bar"><i id="barFill"></i></div>
-        <span>前路</span>
+    <div class="slot" id="slot" data-state="hint">
+      <div data-for="hint">
+        <p class="hint"><span id="hintText">按住镜子，向右拖动</span><span class="arrow" id="arrow" aria-hidden="true">→</span></p>
+        <div class="steps" role="group" aria-label="不想拖动时，也可以点按钮转动镜子">
+          <button type="button" class="btn" id="lessBtn" aria-disabled="true">← 转回一点</button>
+          <button type="button" class="btn" id="moreBtn">再转一点 →</button>
+        </div>
       </div>
-      <p class="hint" id="hint">拖动后视镜，回头看看</p>
+      <div data-for="ready">
+        <p class="hint">旧笔记都看清了。慢慢读，读完再点按钮，镜子不会自动回正。</p>
+        <button type="button" class="btn primary" id="returnBtn">回到前路</button>
+      </div>
+      <div data-for="done">
+        <p class="hint">镜子已回正，前方的要求重新清楚了。</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="seeBtn">看对照结果 ↓</button>
+          <button type="button" class="btn" id="replayBtn">再看一次</button>
+        </div>
+      </div>
     </div>
-    <a class="return-link" href="index.html">← 返回书的入口</a>
-  </div>
+  </section>
+
+  <section class="front" aria-labelledby="frontTitle">
+    <div class="front-head">
+      <h2 class="tag tag-front" id="frontTitle">前方 · 眼前要做的事</h2>
+      <span class="front-sub">虚构设定</span>
+    </div>
+    <ul class="front-list" id="frontList">
+      <li class="sign"><span class="sign-k">期限</span><span class="sign-v">周五前交书目</span></li>
+      <li class="sign"><span class="sign-k">要求</span><span class="sign-v">对照课程参考书单</span></li>
+      <li class="sign"><span class="sign-k">要求</span><span class="sign-v">报告需要标页码</span></li>
+    </ul>
+  </section>
+
+  <p class="fine">
+    读书报告、期限和课程要求均为虚构演示。镜中的“60 分”和四种途径沿用现有网页的旧笔记概括，并非一次真实选书经历。
+  </p>
+
+  <section class="after" id="after" aria-labelledby="afterTitle" hidden>
+    <h2 id="afterTitle" tabindex="-1">回到前路之后</h2>
+    <p class="lead">眼前的要求重新清楚了。把镜中的旧笔记放到它们旁边，看一看：</p>
+
+    <article class="panel p-note">
+      <div class="tags">
+        <span class="tag tag-note">旧笔记 · 概括</span>
+      </div>
+      <h3>原则：可以作为提醒</h3>
+      <p class="quote">“准备到 60 分可以开始”</p>
+      <p>可以把它留在手边当提醒。“60 分”不是经过验证的量化标准；具体选哪本书，仍要看眼前的要求。</p>
+    </article>
+
+    <article class="panel p-note">
+      <div class="tags">
+        <span class="tag tag-note">旧笔记 · 概括</span>
+        <span class="tag tag-demo">互动演示 · 虚构情境</span>
+      </div>
+      <h3>四种途径：放到眼前的要求里，逐一提问</h3>
+      <p class="meta">下面的问题是针对虚构情境的演示提问，并非旧笔记原文。</p>
+      <ol class="routes">
+        <li class="route">
+          <strong>论坛</strong>
+          <p>这条推荐在课程参考书单里吗？</p>
+        </li>
+        <li class="route">
+          <strong>电子书应用</strong>
+          <p>显示的页码能用于报告吗？</p>
+        </li>
+        <li class="route">
+          <strong>书评</strong>
+          <p>这篇书评的角度与报告有关吗？</p>
+        </li>
+        <li class="route">
+          <strong>听书</strong>
+          <p>能找到可标页码的原文吗？</p>
+        </li>
+      </ol>
+      <p>每种途径都要按眼前的要求重新判断。</p>
+    </article>
+
+    <h2>两句话，分开看</h2>
+    <article class="panel p-book">
+      <div class="tags">
+        <span class="tag tag-book">书中观点 · 概括</span>
+      </div>
+      <p class="quote">历史有助于校准预期，却不是未来的地图。</p>
+      <p class="meta">《金钱心理学》的观点概括。这条观点本身不是选书建议。</p>
+    </article>
+
+    <article class="panel p-mine">
+      <div class="tags">
+        <span class="tag tag-mine">我的理解 · 概括</span>
+      </div>
+      <p class="quote">基本认知仍可能有用；过去列出的具体方法，需要结合今天的情况重新判断。</p>
+    </article>
+
+    <div class="end-actions">
+      <button type="button" class="btn" id="replayBtn2">再看一次</button>
+      <a class="back" href="index.html">← 返回书的入口</a>
+    </div>
+  </section>
+
+  <p class="sr-only" id="sr" role="status" aria-live="polite"></p>
 
 </main>
 
 <script>
-/* 本地内容配置：以下均为内容概括。 */
-var CONTENT = {
-  noteSummary: "准备到 60 分可以开始",
-  tools: ["论坛", "电子书应用", "书评", "听书"],
-  judgment: "重看旧笔记时，我认为：某些基本认知仍有用，但过去的具体内容需要谨慎判断。",
-  bookView: "历史有助于校准预期，却不是未来的地图。"
-};
-
 (function () {
-  var road = document.getElementById("road");
-  var fog = document.getElementById("fog");
-  var roadLabel = document.getElementById("roadLabel");
-  var title = document.getElementById("title");
-  var mount = document.getElementById("mount");
-  var mirror = document.getElementById("mirror");
-  var note = document.getElementById("note");
-  var dock = document.getElementById("dock");
-  var judge = document.getElementById("judge");
-  var quote = document.getElementById("quote");
-  var barFill = document.getElementById("barFill");
-  var hint = document.getElementById("hint");
+  "use strict";
 
-  note.querySelector(".line1").textContent = CONTENT.noteSummary;
-  var chips = note.querySelector(".chips");
-  chips.textContent = "";
-  CONTENT.tools.forEach(function (tool) {
-    var chip = document.createElement("span");
-    chip.textContent = tool;
-    chips.appendChild(chip);
-  });
-  judge.querySelector("p").textContent = CONTENT.judgment;
-  quote.querySelector("p").textContent = CONTENT.bookView;
+  /* 约 70% 只是“出现回到前路按钮”的界面触发位置，
+     不代表现实中的准备程度，也不是任何经过验证的标准。 */
+  var TRIGGER = 0.7;
+  var EPS = 0.0005;
 
+  var MSG = [
+    "前方的要求还清楚，镜中的旧笔记很模糊。",
+    "镜中的原则已经看清，四种途径还在变清楚。",
+    "镜中的旧笔记全部看清了，前方的要求变模糊了。可以点“回到前路”。",
+    "镜子已回正，前方的要求重新清楚。对照结果在下方。"
+  ];
+  var HINT_START = "按住镜子，向右拖动";
+  var HINT_S0 = "前方的要求还很清楚，镜中只有模糊的轮廓";
+  var HINT_S1 = "镜中的原则先看清了，四种途径还在变清楚";
 
-  var MW = 280;
-  var MH = 124;
+  function $(id) { return document.getElementById(id); }
+
+  var road = $("road");
+  var fog = $("fog");
+  var mount = $("mount");
+  var mirror = $("mirror");
+  var slider = $("slider");
+  var principleEl = $("principleGroup");
+  var routesEl = $("routesGroup");
+  var frontList = $("frontList");
+  var slot = $("slot");
+  var hintText = $("hintText");
+  var arrow = $("arrow");
+  var lessBtn = $("lessBtn");
+  var moreBtn = $("moreBtn");
+  var returnBtn = $("returnBtn");
+  var seeBtn = $("seeBtn");
+  var replayBtn = $("replayBtn");
+  var replayBtn2 = $("replayBtn2");
+  var after = $("after");
+  var afterTitle = $("afterTitle");
+  var sr = $("sr");
+
+  var reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   var t = 0;
-  var baseScale = 1;
-  var maxScale = 2;
-  var dragging = false;
   var touched = false;
+  var returned = false;
+  var dragging = false;
   var startX = 0;
-  var startY = 0;
   var startT = 0;
-  var keyTimer = null;
+  var pending = false;
+  var tweenId = 0;
+  var lastStage = -1;
 
   function clamp(v, a, b) {
     return Math.min(b, Math.max(a, v));
   }
 
-  function layout() {
-    var vw = document.getElementById("stage").clientWidth;
-    var mobile = window.matchMedia("(max-width: 760px)").matches;
-    MH = mobile ? 160 : 124;
-    var top = title.offsetTop + title.offsetHeight + 34;
-    mount.style.top = top + "px";
+  function ease(x) {
+    return x * x * (3 - 2 * x);
+  }
 
-    baseScale = Math.min(1, (vw * (mobile ? 0.82 : 0.62)) / MW);
-    var dockTop = dock.offsetTop;
-    var availH = Math.max(MH * baseScale, dockTop - top - 12);
-    maxScale = Math.max(baseScale, Math.min(2.2, (vw * 0.94) / MW, availH / MH));
-    render();
+  function ramp(v, a, b) {
+    return ease(clamp((v - a) / (b - a), 0, 1));
+  }
+
+  function blurValue(px) {
+    return px < 0.05 ? "none" : "blur(" + px.toFixed(2) + "px)";
+  }
+
+  function setClarity(el, p) {
+    el.style.filter = p >= 0.995 ? "none" : blurValue((1 - p) * 7);
+    el.style.opacity = (0.25 + 0.75 * p).toFixed(3);
+  }
+
+  function stageOf() {
+    if (returned) return 3;
+    if (t >= TRIGGER - EPS) return 2;
+    if (t >= 0.4) return 1;
+    return 0;
+  }
+
+  function announce(msg) {
+    sr.textContent = "";
+    window.setTimeout(function () { sr.textContent = msg; }, 30);
+  }
+
+  function requestRender() {
+    if (pending) return;
+    pending = true;
+    window.requestAnimationFrame(render);
+  }
+
+  function setT(v) {
+    t = clamp(Math.round(v * 1000) / 1000, 0, 1);
+    requestRender();
   }
 
   function render() {
-    var s = baseScale + (maxScale - baseScale) * t;
-    var tilt = (1 - t) * 22;
-    mirror.style.transform =
-      "scale(" + s.toFixed(3) + ") rotateY(" + (-tilt).toFixed(2) + "deg) rotateX(" + ((1 - t) * 8).toFixed(2) + "deg)";
+    pending = false;
+    var reduce = reduceMq.matches;
 
-    note.style.filter = "blur(" + ((1 - t) * 6.5).toFixed(2) + "px)";
-    note.style.opacity = (0.3 + 0.7 * t).toFixed(3);
+    /* 镜子：先看清原则，再看清四种途径 */
+    setClarity(principleEl, ramp(t, 0.1, 0.4));
+    setClarity(routesEl, ramp(t, 0.4, TRIGGER));
 
-    road.style.filter =
-      "blur(" + (t * 9).toFixed(2) + "px) brightness(" + (1 - t * 0.55).toFixed(3) + ")";
-    fog.style.opacity = (t * 0.85).toFixed(3);
-    roadLabel.style.opacity = (0.9 * (1 - t)).toFixed(3);
-    roadLabel.style.filter = "blur(" + (t * 5).toFixed(2) + "px)";
-
-    barFill.style.width = (t * 100).toFixed(1) + "%";
-    mirror.setAttribute("aria-valuenow", Math.round(t * 100));
-
-    var mid = 1 - Math.abs(t - 0.5) / 0.28;
-    judge.classList.toggle("show", mid > 0);
-    judge.style.opacity = mid > 0 ? clamp(mid * 1.4, 0, 1).toFixed(3) : "";
-
-    if (!touched) {
-      hint.textContent = "拖动后视镜，回头看看";
-    } else if (t < 0.18) {
-      hint.textContent = "前路清楚，镜中只剩轮廓";
-    } else if (t > 0.82) {
-      hint.textContent = "旧笔记清楚了，前路却看不清";
+    if (reduce) {
+      mirror.style.transform = "";
     } else {
-      hint.textContent = "两边都只看得清一部分";
+      mirror.style.transform =
+        "rotateY(" + (-(1 - t) * 22).toFixed(2) + "deg) " +
+        "rotateX(" + ((1 - t) * 8).toFixed(2) + "deg) " +
+        "scale(" + (0.94 + 0.06 * t).toFixed(3) + ")";
+    }
+
+    /* 前方：随拖动逐渐模糊 */
+    var fp = ramp(t, 0.05, 0.9);
+    frontList.style.filter = blurValue(fp * 7);
+    frontList.style.opacity = (1 - 0.65 * fp).toFixed(3);
+
+    /* 夜路背景 */
+    road.style.filter = t < 0.01
+      ? "none"
+      : "blur(" + (t * 5).toFixed(2) + "px) brightness(" + (1 - t * 0.5).toFixed(3) + ")";
+    fog.style.opacity = (t * 0.8).toFixed(3);
+
+    slider.value = String(Math.round(t * 100));
+
+    var stage = stageOf();
+    slider.setAttribute("aria-valuetext", MSG[stage]);
+
+    /* 提示文字 */
+    arrow.hidden = touched || returned;
+    if (!touched) {
+      hintText.textContent = HINT_START;
+    } else if (stage === 0) {
+      hintText.textContent = HINT_S0;
+    } else {
+      hintText.textContent = HINT_S1;
+    }
+
+    lessBtn.setAttribute("aria-disabled", t <= 0 ? "true" : "false");
+    moreBtn.setAttribute("aria-disabled", t >= 1 ? "true" : "false");
+
+    mirror.classList.toggle("invite", !touched && !returned);
+    mirror.classList.toggle("locked", returned);
+
+    /* 动作区状态切换，并避免焦点丢失 */
+    var state = returned ? "done" : (stage === 2 ? "ready" : "hint");
+    if (slot.getAttribute("data-state") !== state) {
+      var hadFocus = slot.contains(document.activeElement);
+      slot.setAttribute("data-state", state);
+      if (hadFocus) {
+        var target = state === "ready" ? returnBtn : (state === "done" ? seeBtn : moreBtn);
+        target.focus({ preventScroll: true });
+      }
+    }
+
+    if (stage !== lastStage) {
+      lastStage = stage;
+      if (touched || returned) announce(MSG[stage]);
     }
   }
 
-  function settle() {
-    quote.classList.toggle("show", touched && t > 0.04);
-  }
-
-  function onDown(e) {
+  /* ---------- 指针（触屏 / 鼠标 / 笔） ---------- */
+  mirror.addEventListener("pointerdown", function (e) {
+    if (returned) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     dragging = true;
     touched = true;
-    mirror.classList.remove("invite");
-    quote.classList.remove("show");
     startX = e.clientX;
-    startY = e.clientY;
     startT = t;
     if (mirror.setPointerCapture) {
-      mirror.setPointerCapture(e.pointerId);
+      try { mirror.setPointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
     }
-  }
-
-  function onMove(e) {
-    if (!dragging) return;
-    var dx = e.clientX - startX;
-    var dy = e.clientY - startY;
-    var d = Math.abs(dx) > Math.abs(dy) ? dx : dy;
-    var range = Math.max(180, Math.min(window.innerHeight, window.innerWidth) * 0.45);
-    t = clamp(startT + d / range, 0, 1);
-    render();
-  }
-
-  function onUp() {
-    if (!dragging) return;
-    dragging = false;
-    settle();
-  }
-
-  mirror.addEventListener("pointerdown", onDown);
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp);
-  window.addEventListener("pointercancel", onUp);
-
-  mirror.addEventListener("keydown", function (e) {
-    var step = 0;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") step = 0.05;
-    if (e.key === "ArrowLeft" || e.key === "ArrowUp") step = -0.05;
-    if (e.key === "Home") { t = 0; step = 0.0001; }
-    if (e.key === "End") { t = 1; step = 0.0001; }
-    if (!step) return;
-    e.preventDefault();
-    touched = true;
-    mirror.classList.remove("invite");
-    quote.classList.remove("show");
-    t = clamp(t + (Math.abs(step) < 0.001 ? 0 : step), 0, 1);
-    render();
-    clearTimeout(keyTimer);
-    keyTimer = setTimeout(settle, 450);
+    requestRender();
   });
 
-  window.addEventListener("resize", layout);
-  window.addEventListener("orientationchange", layout);
-  layout();
+  mirror.addEventListener("pointermove", function (e) {
+    if (!dragging || returned) return;
+    var range = Math.max(200, mirror.offsetWidth * 0.7);
+    setT(startT + (e.clientX - startX) / range);
+  });
+
+  function endDrag() {
+    dragging = false;
+  }
+
+  mirror.addEventListener("pointerup", endDrag);
+  mirror.addEventListener("pointercancel", endDrag);
+  mirror.addEventListener("lostpointercapture", endDrag);
+
+  /* ---------- 键盘 / 辅助技术：原生滑块 ---------- */
+  slider.addEventListener("input", function () {
+    if (returned) return;
+    touched = true;
+    setT(Number(slider.value) / 100);
+  });
+
+  slider.addEventListener("focus", function () {
+    var visible = true;
+    try { visible = slider.matches(":focus-visible"); } catch (err) { visible = true; }
+    mount.classList.toggle("is-focus", visible);
+  });
+
+  slider.addEventListener("blur", function () {
+    mount.classList.remove("is-focus");
+  });
+
+  /* ---------- 不拖动时的按钮 ---------- */
+  function nudge(delta) {
+    if (returned) return;
+    touched = true;
+    setT(Math.round((t + delta) * 100) / 100);
+  }
+
+  lessBtn.addEventListener("click", function () {
+    if (lessBtn.getAttribute("aria-disabled") === "true") return;
+    nudge(-0.1);
+  });
+
+  moreBtn.addEventListener("click", function () {
+    if (moreBtn.getAttribute("aria-disabled") === "true") return;
+    nudge(0.1);
+  });
+
+  /* ---------- 回到前路：只有点击后才回正 ---------- */
+  function tweenToZero() {
+    window.cancelAnimationFrame(tweenId);
+    if (reduceMq.matches) {
+      t = 0;
+      render();
+      return;
+    }
+    var from = t;
+    var begin = performance.now();
+    var dur = 700;
+    function step(now) {
+      var k = clamp((now - begin) / dur, 0, 1);
+      t = from * (1 - ease(k));
+      render();
+      if (k < 1) tweenId = window.requestAnimationFrame(step);
+    }
+    tweenId = window.requestAnimationFrame(step);
+  }
+
+  returnBtn.addEventListener("click", function () {
+    if (returned) return;
+    returned = true;
+    dragging = false;
+    slider.disabled = true;
+    after.hidden = false;
+    tweenToZero();
+  });
+
+  seeBtn.addEventListener("click", function () {
+    after.scrollIntoView({ behavior: reduceMq.matches ? "auto" : "smooth", block: "start" });
+    afterTitle.focus({ preventScroll: true });
+  });
+
+  function reset() {
+    window.cancelAnimationFrame(tweenId);
+    returned = false;
+    touched = false;
+    dragging = false;
+    t = 0;
+    lastStage = -1;
+    slider.disabled = false;
+    after.hidden = true;
+    render();
+    window.scrollTo({ top: 0, behavior: reduceMq.matches ? "auto" : "smooth" });
+    slider.focus({ preventScroll: true });
+  }
+
+  replayBtn.addEventListener("click", reset);
+  replayBtn2.addEventListener("click", reset);
+
+  if (reduceMq.addEventListener) {
+    reduceMq.addEventListener("change", render);
+  } else if (reduceMq.addListener) {
+    reduceMq.addListener(render);
+  }
+
+  render();
 })();
 </script>
 </body>
