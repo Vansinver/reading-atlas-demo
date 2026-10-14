@@ -25,7 +25,7 @@
   [data-page="buffer"] .todo-text, [data-page="buffer"] .use-name { font-size: 16px; }
   [data-page="buffer"] .use { min-height: 150px; }
   [data-page="buffer"] .ev-actions { gap: 10px; }
-  [data-page="choice"] .log { height: clamp(240px, 38vh, 320px); height: clamp(240px, 38svh, 320px); overscroll-behavior-y: contain; }
+  [data-page="choice"] .log { height: clamp(240px, 38vh, 320px); height: clamp(240px, 38svh, 320px); }
   [data-page="choice"] .msg, [data-page="choice"] .draft, [data-page="choice"] .opt { font-size: 16px; line-height: 1.7; }
   [data-page="choice"] .msg.system { font-size: 13px; }
   [data-page="choice"] .pre-status, [data-page="choice"] .st-limit { font-size: 14px; }
