@@ -599,18 +599,48 @@
   .work-cta { margin-top: auto; gap: 10px; font-size: 13px; line-height: 1.65; letter-spacing: .02em; }
   .work-cta .arrow { flex: none; }
   .mini, .desk-preview, .chip-preview, .chat-preview { flex: none; }
+  .scene {
+    grid-template-areas:
+      "book intro"
+      "book works"
+      "book disclaimer";
+    row-gap: 18px;
+  }
+  .intro { grid-area: intro; max-width: 720px; }
+  .intro-eyebrow { color: var(--amber); font-size: 12px; letter-spacing: .16em; }
+  .intro h1 { margin-top: 12px; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.25; letter-spacing: .04em; }
+  .intro p:not(.intro-eyebrow) { margin-top: 12px; color: var(--ink-dim); font-size: 16px; line-height: 1.75; }
+  .intro .intro-start-note { color: var(--ink); }
+  .intro-start { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: 16px; padding: 10px 20px; border-radius: 999px; background: var(--amber); color: #12100d; font-size: 16px; font-weight: 700; }
+  .intro-start:hover, .intro-start:focus-visible { background: #ffd08a; }
+  .intro-start:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+  .book-wrap { grid-area: book; }
+  .works { grid-area: works; }
+  .work-recommend { align-self: flex-start; margin-bottom: 10px; padding: 4px 9px; border-radius: 5px; background: var(--amber); color: #12100d; font-size: 12px; font-weight: 700; }
+  .work-scene, .work-action, .work-outcome { font-size: 14px; line-height: 1.6; color: var(--ink-dim); }
+  .work-scene { margin-top: 2px; color: var(--amber); }
+  .work-action, .work-outcome { margin-top: 9px; }
+  .work-outcome { color: var(--ink); }
+  .site-disclaimer { grid-area: disclaimer; color: var(--ink-faint); font-size: 12px; line-height: 1.65; }
   @media (max-width: 999px) {
-    .scene { grid-template-columns: minmax(0, 1fr); min-height: auto; gap: 40px; padding-top: 32px; }
+    .scene { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "book" "works" "disclaimer"; min-height: auto; gap: 24px; padding-top: 32px; }
+    .intro { width: min(680px, 100%); justify-self: center; }
     .book { width: min(300px, 65vw); }
     .book-wrap { width: 100%; }
     .works { width: min(680px, 100%); justify-self: center; }
     .works-head { text-align: center; }
     .work-title { font-size: 24px; }
+    .site-disclaimer { width: min(680px, 100%); justify-self: center; }
   }
   @media (max-width: 599px) {
-    .scene { padding-left: 20px; padding-right: 20px; gap: 32px; }
+    .scene { padding-left: 20px; padding-right: 20px; gap: 20px; }
+    .intro h1 { font-size: clamp(25px, 7vw, 32px); }
+    .intro p:not(.intro-eyebrow) { font-size: 15px; line-height: 1.65; margin-top: 9px; }
+    .intro-start { margin-top: 12px; }
     .works { grid-template-columns: minmax(0, 1fr); width: min(400px, 100%); }
-    .book { width: min(260px, 67vw); }
+    .book { width: min(150px, 36vw); }
+    .book-wrap { padding-top: 0; }
+    .caption { margin-top: 4px; }
     .works-head { font-size: 16px; }
     .work { padding: 18px; }
     .work-title { font-size: 24px; }
@@ -655,12 +685,20 @@
 
 <header class="top">
   <span class="brand" id="siteName"></span>
-  <span class="now">一本书 · 一个现场</span>
+  <span class="now">一本书，四个互动现场</span>
 </header>
 
 <main class="scene" id="scene">
 
   <div class="vertical" id="verticalTitle" aria-hidden="true"></div>
+
+  <section class="intro" aria-labelledby="intro-title">
+    <p class="intro-eyebrow">阅读装置 · 《金钱心理学》</p>
+    <h1 id="intro-title">一本书，四个互动现场</h1>
+    <p>把《金钱心理学》里的四个想法，放进大学生活中的选书、目标、生活费和小组合作。选一个场景，动手试一次，看看自己会注意到什么。</p>
+    <p class="intro-start-note">建议从《后视镜》开始：拖动镜子，看看过去的经验怎样影响眼前的判断。</p>
+    <a class="intro-start" href="rearview.html">先体验《后视镜》 →</a>
+  </section>
 
   <section class="book-wrap" aria-label="当前展示的书">
     <div class="halo"></div>
@@ -681,6 +719,8 @@
 
   <nav class="works" id="works" aria-label="作品入口"></nav>
 
+  <p class="site-disclaimer">以上是互动情境演示。筹码、任务和人物回复用于帮助理解作品中的想法。</p>
+
 </main>
 
 <script>
@@ -700,7 +740,11 @@ var CONFIG = {
       title: "后视镜",
       href: "rearview.html",
       pairing: "《金钱心理学》× 旧课程笔记",
-      cta: "拖动后视镜，回头看看",
+      scene: "为课程读书报告选书",
+      action: "拖动后视镜，比较一段旧课程笔记和眼前的选书要求。",
+      outcome: "旧经验可以提醒自己，具体做法仍要按今天的要求重新判断。",
+      recommended: true,
+      cta: "进入《后视镜》",
       previewTag: "笔记概括",
       previewLine: "准备到 60 分可以开始"
     },
@@ -709,7 +753,10 @@ var CONFIG = {
       title: "不同的游戏",
       href: "game.html",
       pairing: "《金钱心理学》× 大学书桌",
-      cta: "选一块屏幕，看看你的目标",
+      scene: "升学、做作品或求职",
+      action: "选一个自己的目标，再看看别人的好消息会怎样占据注意力。",
+      outcome: "比较成绩和听取建议之前，先弄清彼此的目标是否相同。",
+      cta: "进入《不同的游戏》",
       previewKind: "screens"
     },
     {
@@ -717,7 +764,10 @@ var CONFIG = {
       title: "这笔钱，先不安排",
       href: "buffer.html",
       pairing: "《金钱心理学》× 生活费",
-      cta: "安排生活费，给未知留点余地",
+      scene: "安排生活费",
+      action: "分配演示筹码，再面对一件计划外的事。",
+      outcome: "留一部分暂不安排，可能为未知情况保留余地。",
+      cta: "进入《这笔钱，先不安排》",
       previewKind: "chips"
     },
     {
@@ -725,7 +775,10 @@ var CONFIG = {
       title: "你想怎么做？",
       href: "choice.html",
       pairing: "《金钱心理学》× 小组展示",
-      cta: "改一条邀请，给同学选择的余地",
+      scene: "邀请同学一起完成小组展示",
+      action: "给邀请加入具体做法，看看同学的模拟回复，再决定怎样继续。",
+      outcome: "给对方选择的余地，也要容得下不同提议或不参与。",
+      cta: "进入《你想怎么做？》",
       previewKind: "chat"
     }
   ]
@@ -774,14 +827,14 @@ var CONFIG = {
   var works = document.getElementById("works");
   var head = document.createElement("div");
   head.className = "works-head";
-  head.textContent = "这本书里，有几个让我停下来的想法。";
+  head.textContent = "四个现场，选一个进入";
   works.appendChild(head);
 
   CONFIG.works.forEach(function (w) {
     var a = document.createElement("a");
     a.className = "work";
     a.href = w.href;
-    a.setAttribute("aria-label", w.type + "：" + w.title + "，" + w.pairing);
+    a.setAttribute("aria-label", w.type + "：" + w.title + "。场景：" + w.scene + "。" + w.action);
 
     a.innerHTML =
       '<div class="mini" aria-hidden="true">' +
@@ -801,8 +854,10 @@ var CONFIG = {
       '<div class="work-meta">' +
         '<span class="work-type"></span>' +
         '<span class="work-title"></span>' +
-        '<span class="work-pair"></span>' +
+        '<span class="work-scene"></span>' +
       '</div>' +
+      '<p class="work-action"></p>' +
+      '<p class="work-outcome"></p>' +
       '<div class="work-cta">' +
         '<span class="cta-text"></span>' +
         '<span class="arrow" aria-hidden="true">→</span>' +
@@ -812,8 +867,16 @@ var CONFIG = {
     a.querySelector(".mini-note strong").textContent = w.previewLine;
     a.querySelector(".work-type").textContent = w.type;
     a.querySelector(".work-title").textContent = w.title;
-    a.querySelector(".work-pair").textContent = w.pairing.split("×").pop().trim();
+    a.querySelector(".work-scene").textContent = "场景：" + w.scene;
+    a.querySelector(".work-action").textContent = w.action;
+    a.querySelector(".work-outcome").textContent = "你会看到：" + w.outcome;
     a.querySelector(".cta-text").textContent = w.cta;
+    if (w.recommended) {
+      var recommend = document.createElement("span");
+      recommend.className = "work-recommend";
+      recommend.textContent = "建议先体验";
+      a.prepend(recommend);
+    }
 
     if (w.previewKind === "screens") {
       var desk = document.createElement("div");

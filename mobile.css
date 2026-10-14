@@ -40,8 +40,8 @@
   [data-page="rearview"] .note { padding: 10px 12px; gap: 5px; }
 }
 @media (max-width: 599px) {
-  [data-page="index"] .scene { padding-top: 20px; gap: 24px; }
-  [data-page="index"] .book { width: min(220px, 57vw); width: min(220px, 57vw, calc(45svh * 400 / 618)); }
+  [data-page="index"] .scene { padding-top: 20px; gap: 20px; }
+  [data-page="index"] .book { width: min(150px, 36vw, calc(28svh * 400 / 618)); }
   [data-page="index"] .floor-shadow { margin-top: 12px; height: 10px; }
   [data-page="index"] .caption { margin-top: 8px; }
 }
