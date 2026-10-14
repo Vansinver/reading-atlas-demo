@@ -1,0 +1,50 @@
+/* Mobile-only adjustments; no remote dependencies. */
+@media (max-width: 760px) {
+  :root { --ink-dim: #c5beaf; --ink-faint: #aaa394; }
+  body { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .top { flex-wrap: wrap; gap: 10px; }
+  .kicker { white-space: normal; line-height: 1.5; }
+  .back, .btn, .return-link { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .opt { min-height: 44px; }
+  .btn, .back, .return-link, .opt { touch-action: manipulation; }
+  .hint { font-size: 16px; line-height: 1.65; letter-spacing: .02em; }
+  .demo, .sub, .setting, .note-tag, .tag, .use-note, .use-state, .ev-sub { font-size: 13px; line-height: 1.6; }
+  .note p { font-size: 16px; line-height: 1.75; }
+  .lamp, .halo, .floor-shadow, .dash { animation: none; }
+  .note, .work, .status, .card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  [data-page="index"] .work { background: rgba(14, 18, 25, .94); }
+  [data-page="index"] .mini-note { filter: none; opacity: 1; }
+  [data-page="index"] .mini { transform: none; }
+  [data-page="index"] .book { animation: none; }
+  [data-page="game"] .stage { height: clamp(460px, 68vh, 600px); height: clamp(460px, 68svh, 600px); }
+  [data-page="game"] .b-text, [data-page="game"] .todo-text, [data-page="game"] .question { font-size: 16px; line-height: 1.55; }
+  [data-page="game"] .face-side { padding: 8px; }
+  [data-page="game"] .bubble { padding: 9px; gap: 5px; }
+  [data-page="game"] .tag, [data-page="game"] .b-label, [data-page="game"] .tap { font-size: 12px; line-height: 1.45; letter-spacing: .04em; }
+  [data-page="buffer"] .status { position: relative; top: auto; background: #0c1016; }
+  [data-page="buffer"] .todo-text, [data-page="buffer"] .use-name { font-size: 16px; }
+  [data-page="buffer"] .use { min-height: 150px; }
+  [data-page="buffer"] .ev-actions { gap: 10px; }
+  [data-page="choice"] .log { height: clamp(240px, 38vh, 320px); height: clamp(240px, 38svh, 320px); overscroll-behavior-y: contain; }
+  [data-page="choice"] .msg, [data-page="choice"] .draft, [data-page="choice"] .opt { font-size: 16px; line-height: 1.7; }
+  [data-page="choice"] .msg.system { font-size: 13px; }
+  [data-page="choice"] .pre-status, [data-page="choice"] .st-limit { font-size: 14px; }
+  html.rearview-page { height: auto; overflow-y: auto; }
+  body[data-page="rearview"] { height: auto; overflow-y: auto; }
+  [data-page="rearview"] { --mirror-h: 160px; }
+  [data-page="rearview"] .stage { height: max(820px, 100vh); height: max(820px, 100svh); overflow: visible; }
+  [data-page="rearview"] .dock { pointer-events: auto; }
+  [data-page="rearview"] .card { background: #0c0f14; }
+  [data-page="rearview"] .card p { font-size: 16px; line-height: 1.65; }
+  [data-page="rearview"] .card small, [data-page="rearview"] .note .line2, [data-page="rearview"] .chips span { font-size: 12px; line-height: 1.5; }
+  [data-page="rearview"] .note { padding: 10px 12px; gap: 5px; }
+}
+@media (max-width: 599px) {
+  [data-page="index"] .scene { padding-top: 20px; gap: 20px; }
+  [data-page="index"] .book { width: min(150px, 36vw, calc(28svh * 400 / 618)); }
+  [data-page="index"] .floor-shadow { margin-top: 12px; height: 10px; }
+  [data-page="index"] .caption { margin-top: 8px; }
+}
+@media (max-width: 359px) {
+  [data-page="buffer"] .uses { grid-template-columns: minmax(0, 1fr); }
+}
