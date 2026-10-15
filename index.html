@@ -1,958 +1,192 @@
-<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>阅读装置</title>
-<style>
-  :root {
-    --ink: #e9e4d8;
-    --ink-dim: #c5beaf;
-    --ink-faint: #aaa394;
-    --amber: #f2b45c;
-    --amber-soft: rgba(242, 180, 92, 0.14);
-    --cyan: #8fd3e8;
-    --glass: rgba(14, 18, 25, 0.62);
-    --glass-line: rgba(255, 255, 255, 0.09);
-    --rx: 0deg;
-    --ry: 0deg;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html,
-  body {
-    min-height: 100%;
-    background: #05070b;
-    color: var(--ink);
-    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body {
-    overflow-x: hidden;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  /* ---------- 夜路背景 ---------- */
-  .backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .backdrop svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-    filter: blur(1.2px) brightness(0.8);
-  }
-
-  .dash {
-    stroke-dasharray: 26 34;
-    animation: drive 3.2s linear infinite;
-  }
-
-  @keyframes drive {
-    to {
-      stroke-dashoffset: -60;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080b10">
+  <title>阅读装置｜选一本书</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #e9e4d8;
+      --muted: #c5beaf;
+      --amber: #f2b45c;
+      --cyan: #8fd3e8;
     }
-  }
-
-  .backdrop::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 50% 46%, rgba(242, 180, 92, 0.16) 0%, transparent 42%),
-      radial-gradient(ellipse at 50% 60%, transparent 35%, rgba(0, 0, 0, 0.82) 100%);
-  }
-
-  /* ---------- 顶部 ---------- */
-  .top {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: max(20px, env(safe-area-inset-top)) clamp(18px, 4vw, 48px) 0;
-  }
-
-  .brand {
-    font-size: 13px;
-    letter-spacing: 0.42em;
-    color: var(--ink-dim);
-  }
-
-  .brand::before {
-    content: "";
-    display: inline-block;
-    width: 7px;
-    height: 7px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background: var(--amber);
-    box-shadow: 0 0 12px var(--amber);
-    vertical-align: middle;
-  }
-
-  .now {
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    color: var(--ink-faint);
-  }
-
-  /* ---------- 主画面 ---------- */
-  .scene {
-    position: relative;
-    z-index: 2;
-    min-height: calc(100vh - 60px);
-    min-height: calc(100dvh - 60px);
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: clamp(20px, 4vw, 64px);
-    padding: clamp(20px, 4vh, 48px) clamp(18px, 4vw, 48px) max(28px, env(safe-area-inset-bottom));
-  }
-
-  /* 侧边竖排书名 */
-  .vertical {
-    justify-self: start;
-    align-self: center;
-    writing-mode: vertical-rl;
-    font-size: clamp(40px, 6.2vw, 92px);
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    line-height: 1;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(242, 180, 92, 0.32);
-    user-select: none;
-    pointer-events: none;
-  }
-
-  /* ---------- 书 ---------- */
-  .book-wrap {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    perspective: 1200px;
-  }
-
-  .halo {
-    position: absolute;
-    top: 42%;
-    left: 50%;
-    width: 150%;
-    aspect-ratio: 1;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(242, 180, 92, 0.22) 0%, rgba(242, 180, 92, 0.05) 40%, transparent 68%);
-    animation: breathe 7s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  @keyframes breathe {
-    0%, 100% {
-      opacity: 0.75;
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: #080b10; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 50% 88%, rgba(242, 180, 92, .12), transparent 43%),
+        linear-gradient(180deg, #05070b 0%, #111725 72%, #161821 100%);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
-    50% {
-      opacity: 1;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .35;
+      background: linear-gradient(155deg, transparent 73%, rgba(242, 180, 92, .08) 84%, transparent 95%);
     }
-  }
-
-  .book {
-    position: relative;
-    width: clamp(190px, 24vw, 320px);
-    aspect-ratio: 400 / 618;
-    transform-style: preserve-3d;
-    transform: rotateY(calc(-16deg + var(--ry))) rotateX(calc(4deg + var(--rx)));
-    animation: float 8s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% {
-      translate: 0 0;
+    a { color: inherit; text-decoration: none; }
+    .shell { position: relative; width: min(1080px, 100%); margin: 0 auto; padding: 24px 32px 56px; }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { color: var(--muted); font-size: 13px; letter-spacing: .36em; white-space: nowrap; }
+    .brand::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 12px;
+      border-radius: 50%;
+      vertical-align: middle;
+      background: var(--amber);
+      box-shadow: 0 0 14px var(--amber);
     }
-    50% {
-      translate: 0 -8px;
+    .top-note { color: #aaa394; font-size: 12px; letter-spacing: .1em; }
+    .hero { max-width: 790px; margin: clamp(40px, 8vh, 84px) 0 42px; }
+    .eyebrow { margin: 0 0 14px; color: var(--amber); font-size: 13px; letter-spacing: .12em; }
+    h1 { margin: 0; font-size: clamp(34px, 5vw, 56px); line-height: 1.2; letter-spacing: .02em; }
+    .hero p:last-child { max-width: 720px; margin: 16px 0 0; color: var(--muted); font-size: clamp(15px, 1.7vw, 18px); line-height: 1.75; }
+    .section-title { display: flex; align-items: baseline; gap: 12px; margin: 0 0 18px; }
+    .section-title h2 { margin: 0; font-size: 22px; }
+    .section-title span { color: #aaa394; font-size: 13px; }
+    .shelf { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .book-card {
+      min-width: 0;
+      min-height: 290px;
+      display: grid;
+      grid-template-columns: 114px minmax(0, 1fr);
+      gap: 22px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 24px;
+      background: rgba(14, 18, 25, .84);
+      box-shadow: 0 22px 50px rgba(0, 0, 0, .25);
     }
-  }
-
-  .cover {
-    position: absolute;
-    inset: 0;
-    border-radius: 3px 8px 8px 3px;
-    overflow: hidden;
-    background: linear-gradient(155deg, #1d222b 0%, #0f1218 55%, #191d24 100%);
-    box-shadow:
-      0 30px 60px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(242, 180, 92, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  }
-
-  .cover::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 14px;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.55), rgba(255, 255, 255, 0.06) 60%, transparent);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .cover::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(118deg, rgba(255, 255, 255, 0.14) 0%, transparent 32%, transparent 70%, rgba(255, 255, 255, 0.05) 100%);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-
-  .placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 28px;
-    padding: 12% 12% 9% 16%;
-  }
-
-  .placeholder .rule {
-    width: 38%;
-    height: 2px;
-    background: var(--amber);
-  }
-
-  .placeholder .ph-title {
-    font-size: clamp(26px, 3.4vw, 44px);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: 0.08em;
-    color: var(--ink);
-    word-break: keep-all;
-  }
-
-  .placeholder .ph-mark {
-    border: 1px dashed rgba(242, 180, 92, 0.55);
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 10.5px;
-    line-height: 1.6;
-    color: var(--amber);
-    background: rgba(242, 180, 92, 0.06);
-  }
-
-  .placeholder .ph-mark code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 10px;
-    color: var(--ink-dim);
-  }
-
-  .pages {
-    position: absolute;
-    top: 1.5%;
-    bottom: 1.5%;
-    right: 0;
-    width: 22px;
-    transform-origin: right center;
-    transform: rotateY(-90deg);
-    background: repeating-linear-gradient(90deg, #d9d2c2 0 1px, #bfb7a6 1px 2px);
-    opacity: 0.7;
-  }
-
-  .floor-shadow {
-    width: 80%;
-    height: 22px;
-    margin-top: 26px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.7), transparent 70%);
-    animation: shadow 8s ease-in-out infinite;
-  }
-
-  @keyframes shadow {
-    0%, 100% {
-      transform: scaleX(1);
-      opacity: 0.9;
-    }
-    50% {
-      transform: scaleX(0.9);
-      opacity: 0.65;
-    }
-  }
-
-  .caption {
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: clamp(15px, 1.6vw, 18px);
-    letter-spacing: 0.12em;
-  }
-
-  .caption .label {
-    font-size: 10px;
-    letter-spacing: 0.24em;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: #0d1117;
-    background: var(--amber);
-    font-weight: 700;
-  }
-
-  /* ---------- 作品入口 ---------- */
-  .works {
-    justify-self: end;
-    align-self: end;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    width: min(340px, 100%);
-    margin-bottom: clamp(0px, 6vh, 64px);
-  }
-
-  .works-head {
-    font-size: 11px;
-    letter-spacing: 0.32em;
-    color: var(--ink-faint);
-    padding-left: 2px;
-  }
-
-  .work {
-    position: relative;
-    display: block;
-    padding: 16px;
-    border-radius: 18px;
-    background: var(--glass);
-    border: 1px solid var(--glass-line);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
-    transition: transform 0.4s ease, border-color 0.4s ease;
-    outline: none;
-  }
-
-  .work:hover,
-  .work:focus-visible {
-    transform: translateY(-3px);
-    border-color: rgba(242, 180, 92, 0.45);
-  }
-
-  .work:focus-visible {
-    box-shadow:
-      0 0 0 3px rgba(143, 211, 232, 0.6),
-      0 20px 50px rgba(0, 0, 0, 0.45);
-  }
-
-  /* 迷你后视镜 */
-  .mini {
-    position: relative;
-    height: 92px;
-    border-radius: 16px;
-    padding: 5px;
-    background: linear-gradient(160deg, #3a3f48, #14171c 60%, #22262d);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    transform: perspective(600px) rotateY(-14deg) rotateX(6deg);
-    transition: transform 0.6s ease;
-  }
-
-  .mini-glass {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(20, 26, 34, 0.95);
-  }
-
-  .mini-glass svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.5;
-  }
-
-  .mini-note {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 5px;
-    padding: 8px 12px;
-    filter: blur(4px);
-    opacity: 0.45;
-    transition: filter 0.6s ease, opacity 0.6s ease;
-  }
-
-  .mini-note .tag {
-    align-self: flex-start;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    padding: 3px 6px;
-    border-radius: 3px;
-    color: #0d1117;
-    background: var(--cyan);
-  }
-
-  .mini-note strong {
-    font-size: 14px;
-    letter-spacing: 0.04em;
-  }
-
-  .mini-shine {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(115deg, rgba(255, 255, 255, 0.16) 0%, transparent 35%);
-    pointer-events: none;
-  }
-
-  .work:hover .mini,
-  .work:focus-visible .mini {
-    transform: perspective(600px) rotateY(0deg) rotateX(0deg);
-  }
-
-  .work:hover .mini-note,
-  .work:focus-visible .mini-note {
-    filter: blur(0);
-    opacity: 1;
-  }
-
-  .work-meta {
-    margin-top: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .work-type {
-    font-size: 10px;
-    letter-spacing: 0.28em;
-    color: var(--amber);
-  }
-
-  .work-title {
-    font-size: clamp(24px, 2.6vw, 30px);
-    font-weight: 800;
-    letter-spacing: 0.12em;
-  }
-
-  .work-pair {
-    font-size: 12.5px;
-    color: var(--ink-dim);
-    letter-spacing: 0.04em;
-  }
-
-  .work-cta {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--glass-line);
-    font-size: 13px;
-    letter-spacing: 0.08em;
-  }
-
-  .work-cta .arrow {
-    display: inline-grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 1px solid rgba(242, 180, 92, 0.55);
-    color: var(--amber);
-    transition: background 0.3s, color 0.3s;
-  }
-
-  .work:hover .arrow,
-  .work:focus-visible .arrow {
-    background: var(--amber);
-    color: #0d1117;
-  }
-
-  .desk-preview {
-    position: relative; display: flex; align-items: center; gap: 9px;
-    height: 92px; padding: 12px 9px 20px; border-radius: 12px;
-    background: radial-gradient(ellipse at 50% 100%, #f2b45c24, transparent 75%), #0f141c;
-    overflow: hidden;
-  }
-  .desk-preview::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: 7px;
-    height: 8px; border-top: 1px solid #f2b45c66; background: #2a2119;
-  }
-  .preview-screen {
-    position: relative; display: grid; place-items: center; flex: 1; min-width: 0;
-    height: 49px; border: 3px solid #303743; border-radius: 6px;
-    background: #8fd3e813; color: #8fd3e8; font-size: 11px; letter-spacing: .1em;
-  }
-  .preview-screen::after {
-    content: ""; position: absolute; bottom: -8px; left: 44%; width: 12%; height: 5px; background: #303743;
-  }
-  .preview-screen:nth-child(2) { height: 57px; color: var(--amber); background: #f2b45c18; box-shadow: 0 0 18px #f2b45c28; }
-  .preview-screen:nth-child(3) { color: #e79a8f; background: #e79a8f13; }
-
-  .chip-preview { display:flex; align-items:center; justify-content:center; gap:12px; height:92px; border-radius:12px; background:#211a14; }
-  .preview-paper { padding:16px 10px; border-radius:4px; background:#ece3cf; color:#2b241b; font-size:12px; transform:rotate(-6deg); box-shadow:0 7px 15px #0006; }
-  .preview-reserve { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; width:74px; padding:12px 8px; border:1px dashed #f2b45c88; border-radius:10px; }
-  .preview-chip { width:17px; height:17px; border-radius:50%; background:radial-gradient(circle at 30% 30%,#ffe4ad,#f2b45c 55%,#b6772a); box-shadow:inset 0 0 0 2px #b6772a; }
-
-  /* ---------- 手机适配 ---------- */
-  @media (max-width: 820px) {
-    .scene {
-      grid-template-columns: 1fr;
-      justify-items: center;
-      gap: 28px;
-      padding-top: 18px;
-    }
-
-    .vertical {
-      position: absolute;
-      top: 10px;
-      left: 14px;
-      font-size: clamp(40px, 13vw, 64px);
-      opacity: 0.7;
-    }
-
-    .book {
-      width: clamp(170px, 50vw, 240px);
-    }
-
-    .works {
-      justify-self: center;
+    .book-card.available { border-color: rgba(242, 180, 92, .38); }
+    .cover {
       align-self: start;
-      margin-bottom: 0;
+      width: 100%;
+      aspect-ratio: 400 / 618;
+      border-radius: 3px 7px 7px 3px;
+      overflow: hidden;
+      box-shadow: 0 16px 28px rgba(0, 0, 0, .5), 0 0 0 1px rgba(242, 180, 92, .22);
     }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .dash,
-    .halo,
-    .book,
-    .floor-shadow {
-      animation: none;
+    .cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .cover.pending {
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      border: 1px dashed rgba(242, 180, 92, .55);
+      color: var(--amber);
+      background: linear-gradient(145deg, #222028, #10141b);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: center;
     }
-
-    .work,
-    .mini,
-    .mini-note {
-      transition: none;
+    .card-content { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 5px;
+      color: #16120e;
+      background: var(--amber);
+      font-size: 12px;
+      font-weight: 700;
     }
-  }
-
-  .chat-preview { display:flex; flex-direction:column; justify-content:center; gap:8px; height:92px; padding:12px; border-radius:12px; background:#0f141c; }
-  .chat-preview span { align-self:flex-end; padding:7px 9px; border-radius:9px 9px 3px 9px; background:#f2b45c; color:#211a14; font-size:12px; }
-  .chat-preview span + span { align-self:flex-start; border-radius:9px 9px 9px 3px; background:#25303d; color:#e9e4d8; }
-  .work-pair, .cta, .site-name, .book-caption { font-size:14px; line-height:1.7; }
-
-  /* 一本书与四个场景：保留周围留白，缩短入口纵向队列 */
-  .scene {
-    width: min(1280px, 100%);
-    margin: 0 auto;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    align-items: start;
-    gap: clamp(32px, 4vw, 64px);
-    padding: clamp(32px, 5vh, 64px) clamp(24px, 4vw, 48px) 48px;
-  }
-  .vertical { display: none; }
-  .book-wrap { min-width: 0; padding-top: 8px; }
-  .book { width: min(340px, 100%); }
-  .floor-shadow { margin-top: 20px; height: 16px; }
-  .caption { flex-direction: column; gap: 8px; text-align: center; letter-spacing: .04em; line-height: 1.6; font-size: 14px; }
-  .caption .label { font-size: 11px; }
-  .works {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%; min-width: 0;
-    justify-self: stretch; align-self: start;
-    gap: 16px; margin-bottom: 0;
-  }
-  .works-head { grid-column: 1 / -1; font-size: 17px; line-height: 1.7; letter-spacing: .04em; color: var(--ink); padding: 0 0 4px; }
-  .work { display: flex; flex-direction: column; min-width: 0; padding: 16px; }
-  .work-type { display: none; }
-  .work-meta { margin-top: 12px; gap: 6px; margin-bottom: 12px; }
-  .work-title { font-size: clamp(21px, 2vw, 26px); line-height: 1.4; letter-spacing: .04em; overflow-wrap: anywhere; }
-  .work-pair { font-size: 13px; line-height: 1.6; }
-  .work-cta { margin-top: auto; gap: 10px; font-size: 13px; line-height: 1.65; letter-spacing: .02em; }
-  .work-cta .arrow { flex: none; }
-  .mini, .desk-preview, .chip-preview, .chat-preview { flex: none; }
-  .scene {
-    grid-template-areas:
-      "book intro"
-      "book works"
-      "book disclaimer";
-    row-gap: 18px;
-  }
-  .intro { grid-area: intro; max-width: 720px; }
-  .intro-eyebrow { color: var(--amber); font-size: 12px; letter-spacing: .16em; }
-  .intro h1 { margin-top: 12px; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.25; letter-spacing: .04em; }
-  .intro p:not(.intro-eyebrow) { margin-top: 12px; color: var(--ink-dim); font-size: 16px; line-height: 1.75; }
-  .intro .intro-start-note { color: var(--ink); }
-  .intro-start { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; margin-top: 16px; padding: 10px 20px; border-radius: 999px; background: var(--amber); color: #12100d; font-size: 16px; font-weight: 700; }
-  .intro-start:hover, .intro-start:focus-visible { background: #ffd08a; }
-  .intro-start:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
-  .book-wrap { grid-area: book; }
-  .works { grid-area: works; }
-  .work-recommend { align-self: flex-start; margin-bottom: 10px; padding: 4px 9px; border-radius: 5px; background: var(--amber); color: #12100d; font-size: 12px; font-weight: 700; }
-  .work-scene, .work-action, .work-outcome { font-size: 14px; line-height: 1.6; color: var(--ink-dim); }
-  .work-scene { margin-top: 2px; color: var(--amber); }
-  .work-action, .work-outcome { margin-top: 9px; }
-  .work-outcome { color: var(--ink); }
-  .site-disclaimer { grid-area: disclaimer; color: var(--ink-faint); font-size: 12px; line-height: 1.65; }
-  @media (max-width: 999px) {
-    .scene { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "book" "works" "disclaimer"; min-height: auto; gap: 24px; padding-top: 32px; }
-    .intro { width: min(680px, 100%); justify-self: center; }
-    .book { width: min(300px, 65vw); }
-    .book-wrap { width: 100%; }
-    .works { width: min(680px, 100%); justify-self: center; }
-    .works-head { text-align: center; }
-    .work-title { font-size: 24px; }
-    .site-disclaimer { width: min(680px, 100%); justify-self: center; }
-  }
-  @media (max-width: 599px) {
-    .scene { padding-left: 20px; padding-right: 20px; gap: 20px; }
-    .intro h1 { font-size: clamp(25px, 7vw, 32px); }
-    .intro p:not(.intro-eyebrow) { font-size: 15px; line-height: 1.65; margin-top: 9px; }
-    .intro-start { margin-top: 12px; }
-    .works { grid-template-columns: minmax(0, 1fr); width: min(400px, 100%); }
-    .book { width: min(150px, 36vw); }
-    .book-wrap { padding-top: 0; }
-    .caption { margin-top: 4px; }
-    .works-head { font-size: 16px; }
-    .work { padding: 18px; }
-    .work-title { font-size: 24px; }
-    .top { gap: 14px; }
-    .now { font-size: 10px; letter-spacing: .1em; }
-  }
-</style>
-<link rel="stylesheet" href="mobile.css">
+    .status.pending { color: var(--muted); background: #26303b; }
+    .card-content h3 { margin: 16px 0 8px; font-size: clamp(23px, 2.5vw, 29px); line-height: 1.3; }
+    .card-content p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .enter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      margin-top: auto;
+      padding: 9px 18px;
+      border-radius: 999px;
+      color: #17120d;
+      background: var(--amber);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .enter:hover, .enter:focus-visible { background: #ffd08a; }
+    .enter:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+    .closing { margin: 26px 0 0; color: #aaa394; font-size: 12px; line-height: 1.7; }
+    @media (max-width: 760px) {
+      .shell { padding: max(18px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom)); }
+      .top-note { font-size: 11px; }
+      .hero { margin: 34px 0 25px; }
+      .eyebrow { margin-bottom: 8px; }
+      h1 { font-size: clamp(28px, 8vw, 38px); }
+      .hero p:last-child { margin-top: 10px; font-size: 14px; line-height: 1.6; }
+      .section-title { margin-bottom: 12px; }
+      .section-title h2 { font-size: 18px; }
+      .shelf { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+      .book-card { min-height: 0; grid-template-columns: 80px minmax(0, 1fr); gap: 16px; padding: 16px; border-radius: 18px; }
+      .card-content h3 { margin: 8px 0 4px; font-size: 21px; }
+      .card-content p { font-size: 13px; line-height: 1.5; }
+      .enter { min-height: 44px; margin-top: 12px; padding: 8px 14px; font-size: 14px; }
+      .cover.pending { font-size: 16px; }
+    }
+    @media (max-width: 380px) {
+      .shell { padding-left: 14px; padding-right: 14px; }
+      .top-note { letter-spacing: 0; }
+      .book-card { grid-template-columns: 68px minmax(0, 1fr); gap: 12px; }
+    }
+  </style>
 </head>
-<body data-page="index">
+<body>
+  <div class="shell">
+    <header class="top">
+      <span class="brand">阅读装置</span>
+      <span class="top-note">从一本书，进入一个现场</span>
+    </header>
 
-<div class="backdrop" aria-hidden="true">
-  <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#05070d"/>
-        <stop offset="0.7" stop-color="#111827"/>
-        <stop offset="1" stop-color="#1b2232"/>
-      </linearGradient>
-      <linearGradient id="asphalt" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#14171c"/>
-        <stop offset="1" stop-color="#23272e"/>
-      </linearGradient>
-    </defs>
-    <rect width="1000" height="440" fill="url(#sky)"/>
-    <g fill="#cfd8e6">
-      <circle cx="110" cy="70" r="1.2" opacity="0.6"/>
-      <circle cx="250" cy="150" r="1" opacity="0.4"/>
-      <circle cx="400" cy="50" r="1.3" opacity="0.7"/>
-      <circle cx="640" cy="100" r="1" opacity="0.5"/>
-      <circle cx="780" cy="40" r="1.2" opacity="0.6"/>
-      <circle cx="900" cy="170" r="1" opacity="0.4"/>
-    </g>
-    <path d="M0 440 L150 418 L270 426 L390 410 L500 420 L640 408 L780 424 L900 414 L1000 424 L1000 440 Z" fill="#0a0d13"/>
-    <rect y="440" width="1000" height="260" fill="#0b0e13"/>
-    <polygon points="490,440 510,440 1000,700 0,700" fill="url(#asphalt)"/>
-    <line x1="491" y1="440" x2="60" y2="700" stroke="#c9c4b8" stroke-width="2.5" opacity="0.35"/>
-    <line x1="509" y1="440" x2="940" y2="700" stroke="#c9c4b8" stroke-width="2.5" opacity="0.35"/>
-    <line class="dash" x1="500" y1="440" x2="500" y2="700" stroke="#f2c46b" stroke-width="4" opacity="0.7"/>
-  </svg>
-</div>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">阅读装置 · 书架</p>
+        <h1 id="page-title">从一本书，进入一个现场</h1>
+        <p>这里收着读过的书，也收着从书里长出的互动现场。先选一本书，再选一个场景，动手试试看。</p>
+      </section>
 
-<header class="top">
-  <span class="brand" id="siteName"></span>
-  <span class="now">一本书，四个互动现场</span>
-</header>
+      <section aria-labelledby="shelf-title">
+        <div class="section-title">
+          <h2 id="shelf-title">选一本书</h2>
+          <span>01 可体验 · 01 整理中</span>
+        </div>
+        <div class="shelf">
+          <article class="book-card available">
+            <div class="cover"><img src="assets/psychology-of-money-english-cover.jpg" alt="《金钱心理学》英文版封面"></div>
+            <div class="card-content">
+              <span class="status">已可体验 · 四个互动现场</span>
+              <h3>《金钱心理学》</h3>
+              <p>选一个场景，动手试一次。建议从《后视镜》开始。</p>
+              <a class="enter" href="books/psychology-of-money.html">进入《金钱心理学》 →</a>
+            </div>
+          </article>
 
-<main class="scene" id="scene">
-
-  <div class="vertical" id="verticalTitle" aria-hidden="true"></div>
-
-  <section class="intro" aria-labelledby="intro-title">
-    <p class="intro-eyebrow">阅读装置 · 《金钱心理学》</p>
-    <h1 id="intro-title">一本书，四个互动现场</h1>
-    <p>把《金钱心理学》里的四个想法，放进大学生活中的选书、目标、生活费和小组合作。选一个场景，动手试一次，看看自己会注意到什么。</p>
-    <p class="intro-start-note">建议从《后视镜》开始：拖动镜子，看看过去的经验怎样影响眼前的判断。</p>
-    <a class="intro-start" href="rearview.html">先体验《后视镜》 →</a>
-  </section>
-
-  <section class="book-wrap" aria-label="当前展示的书">
-    <div class="halo"></div>
-    <div class="book">
-      <div class="cover" id="cover">
-        <!-- ===== 封面图片替换位置 =====
-             在下方 CONFIG.book.cover 填入图片路径（例如 images/cover.jpg），
-             脚本会自动用图片替换此占位；留空则显示书名占位。 -->
-      </div>
-      <div class="pages"></div>
-    </div>
-    <div class="floor-shadow"></div>
-    <p class="caption">
-      <span class="label">当前展示</span>
-      <span id="bookCaption"></span>
-    </p>
-  </section>
-
-  <nav class="works" id="works" aria-label="作品入口"></nav>
-
-  <p class="site-disclaimer">以上是互动情境演示。筹码、任务和人物回复用于帮助理解作品中的想法。</p>
-
-</main>
-
-<script>
-/* ==================================================
-   配置区：替换书名、封面、作品信息只需修改这里
-   ================================================== */
-var CONFIG = {
-  siteName: "阅读装置",
-  book: {
-    title: "金钱心理学",
-    cover: "assets/psychology-of-money-english-cover.jpg",
-    edition: "The Psychology of Money（英文版）"
-  },
-  works: [
-    {
-      type: "互动作品",
-      title: "后视镜",
-      href: "rearview.html",
-      pairing: "《金钱心理学》× 旧课程笔记",
-      scene: "为课程读书报告选书",
-      action: "拖动后视镜，比较一段旧课程笔记和眼前的选书要求。",
-      outcome: "旧经验可以提醒自己，具体做法仍要按今天的要求重新判断。",
-      recommended: true,
-      cta: "进入《后视镜》",
-      previewTag: "笔记概括",
-      previewLine: "准备到 60 分可以开始"
-    },
-    {
-      type: "互动作品",
-      title: "不同的游戏",
-      href: "game.html",
-      pairing: "《金钱心理学》× 大学书桌",
-      scene: "升学、做作品或求职",
-      action: "选一个自己的目标，再看看别人的好消息会怎样占据注意力。",
-      outcome: "比较成绩和听取建议之前，先弄清彼此的目标是否相同。",
-      cta: "进入《不同的游戏》",
-      previewKind: "screens"
-    },
-    {
-      type: "互动作品",
-      title: "这笔钱，先不安排",
-      href: "buffer.html",
-      pairing: "《金钱心理学》× 生活费",
-      scene: "安排生活费",
-      action: "分配演示筹码，再面对一件计划外的事。",
-      outcome: "留一部分暂不安排，可能为未知情况保留余地。",
-      cta: "进入《这笔钱，先不安排》",
-      previewKind: "chips"
-    },
-    {
-      type: "互动作品",
-      title: "你想怎么做？",
-      href: "choice.html",
-      pairing: "《金钱心理学》× 小组展示",
-      scene: "邀请同学一起完成小组展示",
-      action: "给邀请加入具体做法，看看同学的模拟回复，再决定怎样继续。",
-      outcome: "给对方选择的余地，也要容得下不同提议或不参与。",
-      cta: "进入《你想怎么做？》",
-      previewKind: "chat"
-    }
-  ]
-};
-/* ================== 配置区结束 ================== */
-
-(function () {
-  var book = CONFIG.book;
-
-  document.title = CONFIG.siteName + "｜《" + book.title + "》";
-  document.getElementById("siteName").textContent = CONFIG.siteName;
-  document.getElementById("verticalTitle").textContent = book.title;
-  document.getElementById("bookCaption").textContent = "《" + book.title + "》· 英文版封面";
-
-  /* ---------- 封面：有图用图，无图用占位 ---------- */
-  var cover = document.getElementById("cover");
-
-  function renderPlaceholder() {
-    cover.innerHTML = "";
-    var ph = document.createElement("div");
-    ph.className = "placeholder";
-
-    var rule = document.createElement("div");
-    rule.className = "rule";
-
-    var title = document.createElement("div");
-    title.className = "ph-title";
-    title.textContent = book.title;
-
-    ph.appendChild(rule);
-    ph.appendChild(title);
-    cover.appendChild(ph);
-  }
-
-  if (book.cover) {
-    var img = document.createElement("img");
-    img.src = book.cover;
-    img.alt = "《" + (book.edition || book.title) + "》封面";
-    img.onerror = renderPlaceholder;
-    cover.appendChild(img);
-  } else {
-    renderPlaceholder();
-  }
-
-  /* ---------- 作品入口 ---------- */
-  var works = document.getElementById("works");
-  var head = document.createElement("div");
-  head.className = "works-head";
-  head.textContent = "四个现场，选一个进入";
-  works.appendChild(head);
-
-  CONFIG.works.forEach(function (w) {
-    var a = document.createElement("a");
-    a.className = "work";
-    a.href = w.href;
-    a.setAttribute("aria-label", w.type + "：" + w.title + "。场景：" + w.scene + "。" + w.action);
-
-    a.innerHTML =
-      '<div class="mini" aria-hidden="true">' +
-        '<div class="mini-glass">' +
-          '<svg viewBox="0 0 280 90" preserveAspectRatio="xMidYMid slice">' +
-            '<rect width="280" height="90" fill="#0f141c"/>' +
-            '<polygon points="132,28 148,28 280,90 0,90" fill="#1b1f26"/>' +
-            '<line x1="140" y1="28" x2="140" y2="90" stroke="#6b5a35" stroke-width="2" stroke-dasharray="7 9"/>' +
-          '</svg>' +
-          '<div class="mini-note">' +
-            '<span class="tag"></span>' +
-            '<strong></strong>' +
-          '</div>' +
-          '<div class="mini-shine"></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="work-meta">' +
-        '<span class="work-type"></span>' +
-        '<span class="work-title"></span>' +
-        '<span class="work-scene"></span>' +
-      '</div>' +
-      '<p class="work-action"></p>' +
-      '<p class="work-outcome"></p>' +
-      '<div class="work-cta">' +
-        '<span class="cta-text"></span>' +
-        '<span class="arrow" aria-hidden="true">→</span>' +
-      '</div>';
-
-    a.querySelector(".mini-note .tag").textContent = w.previewTag;
-    a.querySelector(".mini-note strong").textContent = w.previewLine;
-    a.querySelector(".work-type").textContent = w.type;
-    a.querySelector(".work-title").textContent = w.title;
-    a.querySelector(".work-scene").textContent = "场景：" + w.scene;
-    a.querySelector(".work-action").textContent = w.action;
-    a.querySelector(".work-outcome").textContent = "你会看到：" + w.outcome;
-    a.querySelector(".cta-text").textContent = w.cta;
-    if (w.recommended) {
-      var recommend = document.createElement("span");
-      recommend.className = "work-recommend";
-      recommend.textContent = "建议先体验";
-      a.prepend(recommend);
-    }
-
-    if (w.previewKind === "screens") {
-      var desk = document.createElement("div");
-      desk.className = "desk-preview";
-      desk.setAttribute("aria-hidden", "true");
-      ["升学", "作品", "求职"].forEach(function (label) {
-        var screen = document.createElement("span");
-        screen.className = "preview-screen";
-        screen.textContent = label;
-        desk.appendChild(screen);
-      });
-      a.querySelector(".mini").replaceWith(desk);
-    }
-
-
-    if (w.previewKind === "chips") {
-      var preview = document.createElement("div");
-      preview.className = "chip-preview";
-      preview.setAttribute("aria-hidden", "true");
-      preview.innerHTML = '<span class="preview-paper">生活费</span><span class="preview-reserve"><i class="preview-chip"></i><i class="preview-chip"></i><i class="preview-chip"></i></span>';
-      a.querySelector(".mini").replaceWith(preview);
-    }
-
-    if (w.previewKind === "chat") {
-      var chat = document.createElement("div");
-      chat.className = "chat-preview";
-      chat.setAttribute("aria-hidden", "true");
-      chat.innerHTML = '<span>你想怎么参与？</span><span>我可以帮忙检查稿子。</span>';
-      a.querySelector(".mini").replaceWith(chat);
-    }
-
-    works.appendChild(a);
-  });
-
-  /* ---------- 克制的视差：仅鼠标、仅允许动态时 ---------- */
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce) return;
-
-  var root = document.documentElement;
-  var targetX = 0;
-  var targetY = 0;
-  var curX = 0;
-  var curY = 0;
-  var running = false;
-
-  function tick() {
-    curX += (targetX - curX) * 0.08;
-    curY += (targetY - curY) * 0.08;
-    root.style.setProperty("--ry", (curX * 8).toFixed(2) + "deg");
-    root.style.setProperty("--rx", (-curY * 5).toFixed(2) + "deg");
-    if (Math.abs(targetX - curX) > 0.001 || Math.abs(targetY - curY) > 0.001) {
-      requestAnimationFrame(tick);
-    } else {
-      running = false;
-    }
-  }
-
-  window.addEventListener("pointermove", function (e) {
-    if (e.pointerType !== "mouse") return;
-    targetX = e.clientX / window.innerWidth - 0.5;
-    targetY = e.clientY / window.innerHeight - 0.5;
-    if (!running) {
-      running = true;
-      requestAnimationFrame(tick);
-    }
-  });
-
-  document.addEventListener("mouseleave", function () {
-    targetX = 0;
-    targetY = 0;
-    if (!running) {
-      running = true;
-      requestAnimationFrame(tick);
-    }
-  });
-})();
-</script>
+          <article class="book-card">
+            <div class="cover pending" aria-hidden="true">小狗<br>钱钱</div>
+            <div class="card-content">
+              <span class="status pending">整理中 · 尚未上线</span>
+              <h3>《小狗钱钱》</h3>
+              <p>这本书的页面仍在核对，暂时没有可进入的作品。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+      <p class="closing">书中的想法和页面里的互动情境会分别标明。你可以从已开放的书开始探索。</p>
+    </main>
+  </div>
 </body>
 </html>
